@@ -8,7 +8,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { GitHubIcon } from "@/components/ui/icon"
+import { OAuthProviderIcon } from "@/components/ui/icon"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/hooks/useAuth"
@@ -108,22 +108,23 @@ function Login() {
                 </form>
                 {settingData?.config?.oauth2_providers &&
                     settingData?.config?.oauth2_providers.length > 0 && (
-                    <section className="flex items-center my-3 w-full">
-                        <Separator className="flex-1" />
-                        <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
+                        <section className="flex items-center my-3 w-full">
+                            <Separator className="flex-1" />
+                            <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
                                 OAuth2
-                        </div>
-                        <Separator className="flex-1" />
-                    </section>
-                )}
+                            </div>
+                            <Separator className="flex-1" />
+                        </section>
+                    )}
             </Form>
             <div className="mt-3 flex flex-col gap-3">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (
                     <Button
+                        key={p}
                         className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
                         onClick={() => loginWith(p)}
                     >
-                        {p === "GitHub" && <GitHubIcon className="size-4" />}
+                        <OAuthProviderIcon provider={p} className="size-4" />
                         {p}
                     </Button>
                 ))}

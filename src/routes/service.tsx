@@ -12,9 +12,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { selectableTableFeatures } from "@/lib/table"
 import { ModelService as Service } from "@/types"
 import { serviceTypes } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -34,7 +35,7 @@ export default function ServicePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<Service>[] = [
+    const columns: ColumnDef<typeof selectableTableFeatures, Service>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -54,7 +55,6 @@ export default function ServicePage() {
                     aria-label="Select row"
                 />
             ),
-            enableSorting: false,
             enableHiding: false,
         },
         {
@@ -90,12 +90,12 @@ export default function ServicePage() {
                     <div className="max-w-48 whitespace-normal break-words">
                         {(() => {
                             switch (s.cover) {
-                            case 0: {
-                                return <span>{t("CoverAll")}</span>
-                            }
-                            case 1: {
-                                return <span>{t("IgnoreAll")}</span>
-                            }
+                                case 0: {
+                                    return <span>{t("CoverAll")}</span>
+                                }
+                                case 1: {
+                                    return <span>{t("IgnoreAll")}</span>
+                                }
                             }
                         })()}
                     </div>
@@ -170,10 +170,10 @@ export default function ServicePage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
@@ -204,9 +204,9 @@ export default function ServicePage() {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext(),
-                                            )}
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 )
                             })}
