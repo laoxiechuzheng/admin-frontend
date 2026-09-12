@@ -68,6 +68,7 @@
     "SpecificServers": "特定伺服器",
     "Type": "類型",
     "Interval": "間隔",
+    "FailureThreshold": "連續失敗判定次數",
     "NotifierGroupID": "通知群組ID",
     "Trigger": "觸發",
     "TasksToTriggerOnAlert": "告警時要觸發的任務",

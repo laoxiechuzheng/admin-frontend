@@ -55,8 +55,9 @@ interface ServiceCardProps {
 const serviceFormSchema = z.object({
     cover: z.coerce.number().int().min(0),
     display_index: z.coerce.number().int(),
-    duration: z.coerce.number().int().min(30),
+    duration: z.coerce.number().int().min(1),
     enable_trigger_task: asOptionalField(z.boolean()),
+    failure_threshold: z.coerce.number().int().min(1).max(100).default(7),
     hide_for_guest: asOptionalField(z.boolean()),
     fail_trigger_tasks: z.array(z.number()),
     fail_trigger_tasks_raw: z.string(),
@@ -81,6 +82,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
         defaultValues: data
             ? {
                 ...data,
+                failure_threshold: data.failure_threshold || 7,
                 fail_trigger_tasks_raw: conv.arrToStr(data.fail_trigger_tasks),
                 recover_trigger_tasks_raw: conv.arrToStr(data.recover_trigger_tasks),
                 skip_servers_raw: conv.recordToStrArr(data.skip_servers ? data.skip_servers : {}),
@@ -94,6 +96,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                 max_latency: 0.0,
                 min_latency: 0.0,
                 duration: 30,
+                failure_threshold: 7,
                 notification_group_id: 0,
                 fail_trigger_tasks: [],
                 fail_trigger_tasks_raw: "",
@@ -260,7 +263,31 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel>{t("Interval")} (s)</FormLabel>
                                             <FormControl>
-                                                <Input type="number" placeholder="30" {...field} />
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    placeholder="30"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="failure_threshold"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("FailureThreshold")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    max={100}
+                                                    placeholder="7"
+                                                    {...field}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

@@ -632,6 +632,7 @@ export interface ModelService {
     display_index: number
     duration: number
     enable_trigger_task: boolean
+    failure_threshold: number
     /** 失败时执行的触发任务id */
     fail_trigger_tasks: number[]
     /** 对游客隐藏 */
@@ -658,6 +659,7 @@ export interface ModelServiceForm {
     display_index: number
     duration: number
     enable_trigger_task?: boolean
+    failure_threshold?: number
     fail_trigger_tasks: number[]
     hide_for_guest?: boolean
     latency_notify?: boolean

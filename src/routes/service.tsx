@@ -125,6 +125,11 @@ export default function ServicePage() {
             accessorFn: (row) => row.duration,
         },
         {
+            header: t("FailureThreshold"),
+            accessorKey: "failure_threshold",
+            accessorFn: (row) => row.failure_threshold,
+        },
+        {
             header: t("NotifierGroupID"),
             accessorKey: "ngroup",
             accessorFn: (row) => row.notification_group_id,

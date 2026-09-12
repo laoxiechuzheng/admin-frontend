@@ -72,6 +72,7 @@
     "SpecificServers": "特定服务器",
     "Type": "类型",
     "Interval": "间隔",
+    "FailureThreshold": "连续失败判定次数",
     "NotifierGroupID": "通知组ID",
     "Trigger": "触发",
     "TasksToTriggerOnAlert": "告警时要触发的任务",
