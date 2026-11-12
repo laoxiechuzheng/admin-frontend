@@ -112,8 +112,15 @@ export default function ApiTokensPage() {
                             </TableRow>
                         ) : (
                             data.map((tok) => (
-                                <TableRow key={tok.id}>
-                                    <TableCell className="font-medium">{tok.name}</TableCell>
+                                <TableRow key={tok.id} className="whitespace-nowrap">
+                                    <TableCell className="font-medium">
+                                        <div
+                                            className="min-w-32 max-w-60 truncate"
+                                            title={tok.name}
+                                        >
+                                            {tok.name}
+                                        </div>
+                                    </TableCell>
                                     <TableCell>
                                         <div className="flex flex-wrap gap-1">
                                             {(tok.scopes ?? []).map((s) => (

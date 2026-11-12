@@ -69,7 +69,10 @@ export default function NATPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                    <div
+                        className="min-w-32 max-w-60 truncate font-medium text-foreground"
+                        title={s.name}
+                    >
                         {s.name}
                     </div>
                 )
@@ -87,7 +90,10 @@ export default function NATPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-64 whitespace-normal break-all font-mono text-xs">
+                    <div
+                        className="max-w-64 truncate font-mono text-xs"
+                        title={String(s.host ?? "")}
+                    >
                         {s.host}
                     </div>
                 )
@@ -100,7 +106,10 @@ export default function NATPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-64 whitespace-normal break-all font-mono text-xs">
+                    <div
+                        className="max-w-64 truncate font-mono text-xs"
+                        title={String(s.domain ?? "")}
+                    >
                         {s.domain}
                     </div>
                 )

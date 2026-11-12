@@ -64,7 +64,10 @@ export default function ServicePage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                    <div
+                        className="min-w-32 max-w-60 truncate font-medium text-foreground"
+                        title={s.name}
+                    >
                         {s.name}
                     </div>
                 )
@@ -77,7 +80,10 @@ export default function ServicePage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-64 whitespace-normal break-all font-mono text-xs">
+                    <div
+                        className="max-w-64 truncate font-mono text-xs"
+                        title={String(s.target ?? "")}
+                    >
                         {s.target}
                     </div>
                 )
@@ -90,7 +96,7 @@ export default function ServicePage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
+                    <div className="max-w-48 truncate">
                         {(() => {
                             switch (s.cover) {
                                 case 0: {
@@ -110,7 +116,10 @@ export default function ServicePage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
+                    <div
+                        className="max-w-48 truncate"
+                        title={Object.keys(s.skip_servers ?? {}).join(",")}
+                    >
                         {Object.keys(s.skip_servers ?? {}).join(",")}
                     </div>
                 )

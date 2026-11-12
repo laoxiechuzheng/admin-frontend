@@ -88,7 +88,10 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-40 whitespace-normal break-words font-medium text-foreground">
+                    <div
+                        className="min-w-32 max-w-60 truncate font-medium text-foreground"
+                        title={s.name}
+                    >
                         {s.name}
                     </div>
                 )
@@ -142,10 +145,7 @@ export default function ServerPage() {
                 }
                 const label = owner.username || t("UnknownUser", { id: owner.id })
                 return (
-                    <div
-                        className="max-w-48 whitespace-normal break-words"
-                        title={`uid=${owner.id}`}
-                    >
+                    <div className="max-w-48 truncate" title={`uid=${owner.id}`}>
                         {label}
                     </div>
                 )
@@ -157,7 +157,10 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-40 whitespace-normal break-words font-mono text-xs tabular">
+                    <div
+                        className="max-w-40 truncate font-mono text-xs tabular"
+                        title={String(joinIP(s.geoip?.ip) ?? "")}
+                    >
                         {joinIP(s.geoip?.ip)}
                     </div>
                 )

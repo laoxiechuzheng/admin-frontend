@@ -185,6 +185,27 @@ export function useCurrentPage() {
     return undefined
 }
 
+// Same mark and chip as the public site's header (user-frontend Header.tsx),
+// so both consoles read as one product.
+export function BrandMark({ large }: { large?: boolean }) {
+    return (
+        <span
+            className={cn(
+                "flex shrink-0 items-center justify-center overflow-hidden rounded-md border bg-card",
+                large ? "size-10" : "size-7",
+            )}
+        >
+            <img
+                src="/dashboard/brand-mark.png"
+                alt=""
+                width={40}
+                height={40}
+                className={cn("object-cover object-top", large ? "size-7" : "size-5")}
+            />
+        </span>
+    )
+}
+
 function Brand({ collapsed }: { collapsed?: boolean }) {
     const { t } = useTranslation()
     const { data: settingData } = useSetting()
@@ -195,7 +216,7 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
             className="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-4"
             title={name}
         >
-            <img className="h-6 w-6 shrink-0" src="/dashboard/logo.svg" alt="" />
+            <BrandMark />
             {!collapsed && (
                 <span className="min-w-0 leading-tight">
                     <span className="block truncate text-[13px] font-semibold text-foreground">

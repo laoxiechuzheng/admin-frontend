@@ -69,7 +69,10 @@ export default function NotificationPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                    <div
+                        className="min-w-32 max-w-60 truncate font-medium text-foreground"
+                        title={s.name}
+                    >
                         {s.name}
                     </div>
                 )

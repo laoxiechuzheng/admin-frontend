@@ -215,7 +215,7 @@ export default function TransferPage() {
                                     row.status === ModelServerTransferStatusTimeout ||
                                     row.status === ModelServerTransferStatusCancelled
                                 return (
-                                    <TableRow key={row.id}>
+                                    <TableRow key={row.id} className="whitespace-nowrap">
                                         <TableCell className="font-mono text-xs tabular text-muted-foreground">
                                             {row.id}
                                         </TableCell>

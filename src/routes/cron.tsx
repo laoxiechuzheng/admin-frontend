@@ -65,7 +65,10 @@ export default function CronPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                    <div
+                        className="min-w-32 max-w-60 truncate font-medium text-foreground"
+                        title={s.name}
+                    >
                         {s.name}
                     </div>
                 )
@@ -107,7 +110,7 @@ export default function CronPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
+                    <div className="max-w-48 truncate">
                         {(() => {
                             switch (s.cover) {
                                 case 0: {
@@ -132,7 +135,7 @@ export default function CronPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-16 whitespace-normal break-words">
+                    <div className="max-w-32 truncate" title={(s.servers || []).join(",")}>
                         <span>{(s.servers || []).join(",")}</span>
                     </div>
                 )
@@ -145,7 +148,7 @@ export default function CronPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
+                    <div className="max-w-48 truncate" title={String(s.last_executed_at ?? "")}>
                         {s.last_executed_at}
                     </div>
                 )

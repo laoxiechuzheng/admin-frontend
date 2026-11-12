@@ -1,5 +1,5 @@
 import { Oauth2RequestType, getOauth2RedirectURL } from "@/api/oauth2"
-import { LanguageMenu, ThemeMenu } from "@/components/app-shell"
+import { BrandMark, LanguageMenu, ThemeMenu } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -75,7 +75,7 @@ function Login() {
             </div>
             <div className="w-full max-w-[360px]">
                 <div className="mb-6 flex flex-col items-center text-center">
-                    <img className="h-9 w-9" src="/dashboard/logo.svg" alt="" />
+                    <BrandMark large />
                     <h1 className="mt-4 text-xl font-semibold text-foreground">{siteName}</h1>
                     <p className="mt-1 text-[13px] text-muted-foreground">
                         {t("Shell.SignInHint")}

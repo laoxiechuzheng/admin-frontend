@@ -65,7 +65,11 @@ export default function ServerGroupPage() {
             accessorFn: (row) => row.group.name,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-48 whitespace-normal break-words">{s.group.name}</div>
+                return (
+                    <div className="max-w-48 truncate" title={s.group.name}>
+                        {s.group.name}
+                    </div>
+                )
             },
         },
         {
@@ -75,7 +79,7 @@ export default function ServerGroupPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-48 whitespace-normal break-words">
+                    <div className="max-w-48 truncate" title={(s.servers || []).join(",")}>
                         <span>{(s.servers || []).join(",")}</span>
                     </div>
                 )
