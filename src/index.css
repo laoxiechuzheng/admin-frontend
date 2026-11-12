@@ -7,6 +7,12 @@
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
+    --radius-xl: calc(var(--radius) + 2px);
+
+    --font-sans:
+        "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui,
+        sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
 
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
@@ -24,6 +30,10 @@
     --color-accent-foreground: hsl(var(--accent-foreground));
     --color-destructive: hsl(var(--destructive));
     --color-destructive-foreground: hsl(var(--destructive-foreground));
+    --color-success: hsl(var(--success));
+    --color-warning: hsl(var(--warning));
+    --color-danger: hsl(var(--danger));
+    --color-neutral-status: hsl(var(--neutral-status));
     --color-border: hsl(var(--border));
     --color-input: hsl(var(--input));
     --color-ring: hsl(var(--ring));
@@ -33,63 +43,83 @@
     --color-chart-4: hsl(var(--chart-4));
     --color-chart-5: hsl(var(--chart-5));
 
-    --text-xsm: 0.825rem;
+    --shadow-overlay: var(--overlay-shadow);
+
+    --text-xsm: 0.8125rem;
     --text-xsm--line-height: 1.25rem;
 }
 
+/*
+ * "Signal" design tokens — shared with user-frontend (design/DESIGN.md §3).
+ * Values are HSL triplets converted from the sRGB hex table in the spec.
+ */
 :root {
     --radius: 0.5rem;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: 220 20% 97.1%; /* #F6F7F9 */
+    --foreground: 210 25% 7.8%; /* #0F1419 */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 210 25% 7.8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --popover-foreground: 210 25% 7.8%;
+    --primary: 232 78.8% 57.5%; /* #3D55E8 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 216 18.5% 94.7%; /* #EFF1F4 */
+    --secondary-foreground: 210 25% 7.8%;
+    --muted: 216 18.5% 94.7%;
+    --muted-foreground: 214 10.3% 39.8%; /* #5B6470 */
+    --accent: 216 18.5% 94.7%;
+    --accent-foreground: 210 25% 7.8%;
+    --destructive: 0 69.4% 51.4%; /* #D92D2D */
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 76.5% 33.3%; /* #14965A */
+    --warning: 36 100% 39%; /* #C77700 */
+    --danger: 0 69.4% 51.4%;
+    --neutral-status: 213 8.3% 57.6%; /* #8A929C */
+    --border: 217 16% 90.2%; /* #E2E5EA */
+    --input: 217 16% 87%;
+    --ring: 232 78.8% 57.5%;
+    --chart-1: 232 78.8% 57.5%;
+    --chart-2: 186 67.2% 42%;
+    --chart-3: 151 65.1% 40%;
+    --chart-4: 39 87.2% 48%;
+    --chart-5: 331 70% 58%;
+    --overlay-shadow: 0 8px 24px rgba(15, 20, 25, 0.1);
+    --terminal-bg: #0b0d10;
+    color-scheme: light;
 }
 
 .dark {
-    --background: 0 0% 9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 216 18.5% 5.3%; /* #0B0D10 */
+    --foreground: 216 11.1% 91.2%; /* #E6E8EB */
+    --card: 214 17.1% 8%; /* #111418 */
+    --card-foreground: 216 11.1% 91.2%;
+    --popover: 214 17.1% 8%;
+    --popover-foreground: 216 11.1% 91.2%;
+    --primary: 232 100% 74.1%; /* #7B8CFF */
+    --primary-foreground: 216 18.5% 5.3%;
+    --secondary: 213 17% 10.4%; /* #161A1F */
+    --secondary-foreground: 216 11.1% 91.2%;
+    --muted: 213 17% 10.4%;
+    --muted-foreground: 212 8.9% 58.2%; /* #8B949E */
+    --accent: 213 17% 10.4%;
+    --accent-foreground: 216 11.1% 91.2%;
+    --destructive: 0 83.6% 68.8%; /* #F26D6D */
+    --destructive-foreground: 216 18.5% 5.3%;
+    --success: 151 65.1% 53.9%; /* #3DD68C */
+    --warning: 39 87.2% 60.2%; /* #F2B441 */
+    --danger: 0 83.6% 68.8%;
+    --neutral-status: 215 7.9% 46.9%; /* #6E7681 */
+    --border: 215 15% 15.7%; /* #22272E */
+    --input: 215 14% 19%;
+    --ring: 232 100% 74.1%;
+    --chart-1: 232 100% 74.1%;
+    --chart-2: 186 67.2% 51%;
+    --chart-3: 151 65.1% 53.9%;
+    --chart-4: 39 87.2% 60.2%;
+    --chart-5: 331 82.1% 71.6%;
+    --overlay-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --terminal-bg: #07090b;
+    color-scheme: dark;
 }
 
 @layer base {
@@ -97,8 +127,49 @@
         @apply border-border;
     }
 
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-sans antialiased;
+        font-size: 14px;
+        line-height: 1.5;
+        font-feature-settings: "cv11", "ss01";
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-semibold;
+    }
+
+    :focus-visible {
+        outline: 2px solid hsl(var(--ring));
+        outline-offset: 2px;
+    }
+
+    code,
+    kbd,
+    pre,
+    samp {
+        @apply font-mono;
+    }
+}
+
+@utility tabular {
+    font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
@@ -129,7 +200,7 @@ body,
     overflow: hidden;
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    background: #09090b;
+    background: var(--terminal-bg);
 }
 
 .terminal-screen {

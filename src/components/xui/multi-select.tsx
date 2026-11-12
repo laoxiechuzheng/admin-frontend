@@ -44,24 +44,19 @@ import { KeyboardEvent, forwardRef, useState } from "react"
  * Variants for the multi-select component to handle different styles.
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
  */
-const multiSelectVariants = cva(
-    "m-1 transition ease-in-out delay-150 hover:-translate-y-1 duration-300",
-    {
-        variants: {
-            variant: {
-                default: "border-foreground/10 text-foreground bg-card hover:bg-card/80",
-                secondary:
-                    "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                destructive:
-                    "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-                inverted: "inverted",
-            },
-        },
-        defaultVariants: {
-            variant: "default",
+const multiSelectVariants = cva("m-0.5 transition-colors duration-150", {
+    variants: {
+        variant: {
+            default: "border-border bg-muted text-foreground",
+            secondary: "border-border bg-secondary text-secondary-foreground",
+            destructive: "bg-danger/12 text-danger",
+            inverted: "inverted",
         },
     },
-)
+    defaultVariants: {
+        variant: "default",
+    },
+})
 
 /**
  * Props for MultiSelect component
@@ -210,7 +205,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         {...props}
                         onClick={handleTogglePopover}
                         className={cn(
-                            "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
+                            "flex w-full p-1 rounded-md border border-input min-h-9 h-auto items-center justify-between bg-card text-foreground font-normal hover:bg-card hover:border-muted-foreground/40 dark:bg-background dark:hover:bg-background [&_svg]:pointer-events-auto",
                             className,
                         )}
                     >
@@ -280,7 +275,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                             </div>
                         ) : (
                             <div className="flex items-center justify-between w-full mx-auto">
-                                <span className="text-sm text-muted-foreground mx-3">
+                                <span className="text-[13px] text-muted-foreground mx-2">
                                     {placeholder}
                                 </span>
                                 <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />

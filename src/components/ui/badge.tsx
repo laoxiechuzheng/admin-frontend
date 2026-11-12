@@ -2,18 +2,19 @@ import { cn } from "@/lib/utils"
 import { type VariantProps, cva } from "class-variance-authority"
 import { HTMLAttributes } from "react"
 
+// Signal badge: 20px high, 4px radius, 12px text, semantic color on a 12% tint.
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex h-5 items-center gap-1 whitespace-nowrap rounded-[4px] border border-transparent px-1.5 text-xs font-medium leading-none transition-colors",
     {
         variants: {
             variant: {
-                default:
-                    "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-                secondary:
-                    "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                destructive:
-                    "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-                outline: "text-foreground",
+                default: "bg-primary/12 text-primary",
+                secondary: "bg-muted text-muted-foreground",
+                destructive: "bg-danger/12 text-danger",
+                success: "bg-success/12 text-success",
+                warning: "bg-warning/12 text-warning",
+                neutral: "bg-neutral-status/15 text-muted-foreground",
+                outline: "border-border text-foreground",
             },
         },
         defaultVariants: {

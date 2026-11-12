@@ -20,7 +20,7 @@ const SheetClose = SheetPrimitive.Close
 const SheetPortal = SheetPrimitive.Portal
 
 const sheetVariants = cva(
-    "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+    "fixed z-50 gap-4 bg-card p-5 shadow-overlay transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=open]:duration-200",
     {
         variants: {
             side: {
@@ -52,7 +52,7 @@ const SheetContent = forwardRef<ComponentRef<typeof SheetPrimitive.Content>, She
                 {...props}
             >
                 {children}
-                <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+                <SheetPrimitive.Close className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none">
                     <X
                         className="h-4 w-4"
                         onClick={() => {
@@ -68,7 +68,7 @@ const SheetContent = forwardRef<ComponentRef<typeof SheetPrimitive.Content>, She
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
+    <div className={cn("flex flex-col space-y-1 text-left", className)} {...props} />
 )
 SheetHeader.displayName = "SheetHeader"
 
@@ -86,7 +86,7 @@ const SheetTitle = forwardRef<
 >(({ className, ...props }, ref) => (
     <SheetPrimitive.Title
         ref={ref}
-        className={cn("text-lg font-semibold text-foreground", className)}
+        className={cn("text-base font-semibold text-foreground", className)}
         {...props}
     />
 ))
@@ -98,7 +98,7 @@ const SheetDescription = forwardRef<
 >(({ className, ...props }, ref) => (
     <SheetPrimitive.Description
         ref={ref}
-        className={cn("text-sm text-muted-foreground", className)}
+        className={cn("text-[13px] text-muted-foreground", className)}
         {...props}
     />
 ))

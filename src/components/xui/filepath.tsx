@@ -47,7 +47,7 @@ export const Filepath: FC<FilepathProps> = ({ path, setPath }) => {
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <p
-                        className="cursor-pointer hover:text-white transition"
+                        className="cursor-pointer hover:text-foreground transition-colors"
                         onClick={() => {
                             setPath("/")
                         }}
@@ -92,7 +92,7 @@ export const Filepath: FC<FilepathProps> = ({ path, setPath }) => {
                             {item.href ? (
                                 <>
                                     <p
-                                        className="max-w-20 truncate md:max-w-none cursor-pointer hover:text-white transition"
+                                        className="max-w-20 truncate md:max-w-none cursor-pointer hover:text-foreground transition-colors"
                                         onClick={() => {
                                             setPath(item.href)
                                         }}

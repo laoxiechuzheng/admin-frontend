@@ -21,7 +21,11 @@ import { TableVirtuoso } from "react-virtuoso"
 // but here we don't want it, so let's use a new component with only <table> tag
 const TableComponent = forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
     ({ className, ...props }, ref) => (
-        <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+        <table
+            ref={ref}
+            className={cn("w-full caption-bottom text-[13px]", className)}
+            {...props}
+        />
     ),
 )
 TableComponent.displayName = "TableComponent"
@@ -132,7 +136,7 @@ export function DataTable<TData extends RowData>({
     }, [isDesktop])
 
     return (
-        <div className="rounded-md border" ref={ref} style={{ height: heightState }}>
+        <div className="rounded-lg border bg-card" ref={ref} style={{ height: heightState }}>
             <TableVirtuoso
                 totalCount={rows.length}
                 components={{
@@ -143,7 +147,7 @@ export function DataTable<TData extends RowData>({
                 fixedHeaderContent={() =>
                     table.getHeaderGroups().map((headerGroup) => (
                         // Change header background color to non-transparent
-                        <TableRow className="bg-card hover:bg-muted" key={headerGroup.id}>
+                        <TableRow className="bg-muted hover:bg-muted" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
                                     <TableHead

@@ -43,10 +43,19 @@ export interface IconButtonProps extends ButtonProps {
         | "more"
 }
 
+// Signal: only "add" is a primary action by default; destructive icons are
+// tinted, everything else is a quiet outlined button. Callers may still pass
+// an explicit variant.
+function defaultVariant(icon: IconButtonProps["icon"]): ButtonProps["variant"] {
+    if (icon === "plus") return "default"
+    if (icon === "trash" || icon === "ban") return "destructive"
+    return "outline"
+}
+
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
     return (
         <Button
-            className="rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+            variant={props.variant ?? defaultVariant(props.icon)}
             {...props}
             ref={ref}
             size="icon"
