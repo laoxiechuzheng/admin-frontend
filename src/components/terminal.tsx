@@ -115,7 +115,16 @@ export const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.Intrin
             let active = true
             const terminal = new Terminal({
                 cursorBlink: true,
-                fontSize: window.innerWidth <= 640 ? 13 : 16,
+                fontSize: window.innerWidth <= 640 ? 13 : 15,
+                fontFamily:
+                    'ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, monospace',
+                theme: {
+                    background: "#0b0d10",
+                    foreground: "#e6e8eb",
+                    cursor: "#7b8cff",
+                    cursorAccent: "#0b0d10",
+                    selectionBackground: "rgba(123, 140, 255, 0.3)",
+                },
                 scrollback: 10000,
                 scrollOnUserInput: true,
             })
@@ -337,10 +346,17 @@ export const TerminalPage = () => {
     const terminal = useTerminal(id ? parseInt(id) : undefined)
     const terminalIdRef = useRef<HTMLDivElement>(null)
     return (
-        <div className="terminal-page px-3 sm:px-8">
-            <div className="flex mt-3 sm:mt-6 mb-3 sm:mb-4 items-center gap-2">
-                <h1 className="flex-1 text-xl sm:text-3xl font-bold tracking-tight">{`Terminal (${id})`}</h1>
-                <div className="flex ml-auto gap-2 shrink-0">
+        <div className="terminal-page mx-auto w-full max-w-[1400px] px-3 sm:px-6 lg:px-8">
+            <div className="mb-3 mt-4 flex items-center gap-3 sm:mb-4 sm:mt-6">
+                <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
+                        <TerminalIcon className="h-4 w-4" />
+                    </span>
+                    <h1 className="truncate text-lg font-semibold leading-tight sm:text-xl">
+                        {`Terminal (${id})`}
+                    </h1>
+                </div>
+                <div className="ml-auto flex shrink-0 gap-2">
                     <IconButton
                         icon="expand"
                         onClick={async () => {
@@ -358,7 +374,9 @@ export const TerminalPage = () => {
                     setClose={setOpen}
                 />
             ) : (
-                <p>The server does not exist, or have not been connected yet.</p>
+                <div className="rounded-lg border bg-card px-5 py-10 text-center text-[13px] text-muted-foreground">
+                    The server does not exist, or have not been connected yet.
+                </div>
             )}
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent className="sm:max-w-lg">
@@ -390,7 +408,7 @@ export const TerminalButton = ({ id, menuItem = false }: { id: number; menuItem?
             <button
                 type="button"
                 onClick={handleOpenNewTab}
-                className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
+                className="flex w-full items-center rounded-md px-2 py-1.5 text-[13px] hover:bg-muted"
             >
                 <TerminalIcon className="h-4 w-4 mr-2" />
                 <span>{t("Terminal")}</span>

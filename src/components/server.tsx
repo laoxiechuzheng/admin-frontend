@@ -245,14 +245,14 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
-                <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
                     <div className="items-center mx-1">
                         <DialogHeader>
                             <DialogTitle>{t("EditServer")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -448,7 +448,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         <Button
                                                             type="button"
                                                             variant="outline"
-                                                            className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700 ml-2"
+                                                            className="ml-2 h-6 px-2 text-xs"
                                                             onClick={() =>
                                                                 patchPublicNote(
                                                                     "billingDataMod.startDate",
@@ -530,7 +530,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={toggleEndNoExpiryLocal}
                                                             >
                                                                 {publicNoteObj.billingDataMod
@@ -543,7 +543,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.endDate",
@@ -678,7 +678,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.cycle",
@@ -732,7 +732,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.amount",
@@ -745,7 +745,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "billingDataMod.amount",
@@ -820,7 +820,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
-                                                                className="text-xs px-2 py-0 h-auto bg-gray-200 dark:bg-gray-700"
+                                                                className="h-6 px-2 text-xs"
                                                                 onClick={() =>
                                                                     patchPublicNote(
                                                                         "planDataMod.trafficType",
@@ -970,15 +970,13 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </>
                                     )}
                                 </div>
-                                <DialogFooter className="justify-end">
+                                <DialogFooter className="justify-end pt-2">
                                     <DialogClose asChild>
-                                        <Button type="button" className="my-2" variant="secondary">
+                                        <Button type="button" variant="secondary">
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">
-                                        {t("Submit")}
-                                    </Button>
+                                    <Button type="submit">{t("Submit")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

@@ -89,7 +89,7 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
                 <IconButton {...props} icon="user-pen" />
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
                     <div className="items-center mx-1">
                         <DialogHeader>
                             <DialogTitle>{t("BatchMoveServer")}</DialogTitle>
@@ -107,16 +107,16 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
                                     setToUserId(parseInt(e.target.value, 10))
                                 }}
                             />
-                            <DialogFooter className="justify-end">
+                            <DialogFooter className="justify-end pt-2">
                                 <DialogClose asChild>
-                                    <Button type="button" className="my-2" variant="secondary">
+                                    <Button type="button" variant="secondary">
                                         {t("Cancel")}
                                     </Button>
                                 </DialogClose>
                                 <Button
                                     disabled={!toUserId || toUserId == 0}
                                     type="submit"
-                                    className="my-2"
+
                                     onClick={onSubmit}
                                 >
                                     {t("Move")}

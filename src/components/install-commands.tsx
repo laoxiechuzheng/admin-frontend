@@ -63,7 +63,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                     {menuItem ? (
                         <button
                             type="button"
-                            className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
+                            className="flex w-full items-center rounded-md px-2 py-1.5 text-[13px] hover:bg-muted"
                             title={i18next.t("InstallCommands")}
                         >
                             {copy ? (
@@ -89,7 +89,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                     ) : (
                         <Button ref={ref} title={i18next.t("InstallCommands")} {...props}>
                             {copy ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                            <span className="ml-2">{i18next.t("InstallCommands")}</span>
+                            <span>{i18next.t("InstallCommands")}</span>
                         </Button>
                     )}
                 </DropdownMenuTrigger>

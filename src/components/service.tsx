@@ -1,4 +1,5 @@
 import { createService, updateService } from "@/api/service"
+import { FieldGroupTitle } from "@/components/page"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -14,6 +15,7 @@ import {
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -154,7 +156,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
                     <div className="items-center mx-1">
                         <DialogHeader>
                             <DialogTitle>
@@ -163,7 +165,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                                <FieldGroupTitle>{t("Shell.FormBasic")}</FieldGroupTitle>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -256,43 +259,52 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="duration"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("Interval")} (s)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min={1}
-                                                    placeholder="30"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="failure_threshold"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("FailureThreshold")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min={1}
-                                                    max={100}
-                                                    placeholder="7"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <FieldGroupTitle>{t("Shell.FormProbe")}</FieldGroupTitle>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="duration"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("Interval")} (s)</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min={1}
+                                                        placeholder="30"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    {t("Shell.IntervalHint")}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="failure_threshold"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("FailureThreshold")}</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min={1}
+                                                        max={100}
+                                                        placeholder="7"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    {t("Shell.FailureThresholdHint")}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="cover"
@@ -339,6 +351,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                                <FieldGroupTitle>{t("Shell.FormNotify")}</FieldGroupTitle>
                                 <FormField
                                     control={form.control}
                                     name="notification_group_id"
@@ -431,6 +444,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                                <FieldGroupTitle>{t("Shell.FormTrigger")}</FieldGroupTitle>
                                 <FormField
                                     control={form.control}
                                     name="enable_trigger_task"
@@ -483,15 +497,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end">
+                                <DialogFooter className="justify-end pt-2">
                                     <DialogClose asChild>
-                                        <Button type="button" className="my-2" variant="secondary">
+                                        <Button type="button" variant="secondary">
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">
-                                        {t("Submit")}
-                                    </Button>
+                                    <Button type="submit">{t("Submit")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

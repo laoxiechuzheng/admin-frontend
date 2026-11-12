@@ -1,20 +1,15 @@
 import { swrFetcher } from "@/api/api"
 import { deleteDDNSProfiles, getDDNSProviders } from "@/api/ddns"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { DataTable } from "@/components/data-table"
 import { DDNSCard } from "@/components/ddns"
 import { HeaderButtonGroup } from "@/components/header-button-group"
+import { BoolCell, EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { selectableTableFeatures } from "@/lib/table"
 import { ModelDDNSProfile } from "@/types"
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, useTable } from "@tanstack/react-table"
+import { Globe } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -79,18 +74,24 @@ export default function DDNSPage() {
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                return (
+                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                        {s.name}
+                    </div>
+                )
             },
         },
         {
             header: "IPv4",
             accessorKey: "enableIPv4",
             accessorFn: (row) => row.enable_ipv4 ?? false,
+            cell: ({ row }) => <BoolCell value={row.original.enable_ipv4} />,
         },
         {
             header: "IPv6",
             accessorKey: "enableIPv6",
             accessorFn: (row) => row.enable_ipv6 ?? false,
+            cell: ({ row }) => <BoolCell value={row.original.enable_ipv6} />,
         },
         {
             header: t("Provider"),
@@ -103,7 +104,11 @@ export default function DDNSPage() {
             accessorFn: (row) => row.domains,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.domains}</div>
+                return (
+                    <div className="max-w-64 whitespace-normal break-all font-mono text-xs">
+                        {s.domains}
+                    </div>
+                )
             },
         },
         {
@@ -145,66 +150,30 @@ export default function DDNSPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight">{t("DDNS")}</h1>
-                <HeaderButtonGroup
-                    className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
-                    delete={{
-                        fn: deleteDDNSProfiles,
-                        id: selectedRows.map((r) => r.original.id),
-                        mutate: mutate,
-                    }}
-                >
-                    <DDNSCard mutate={mutate} providers={providers} />
-                </HeaderButtonGroup>
-            </div>
-
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id} className="text-sm">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
-                        </TableRow>
-                    ) : table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+        <Page>
+            <PageHeader
+                title={t("DDNS")}
+                description={t("Shell.Desc.DDNS")}
+                actions={<DDNSCard mutate={mutate} providers={providers} />}
+            />
+            <Panel>
+                <Toolbar selected={selectedRows.length}>
+                    <HeaderButtonGroup
+                        className="flex flex-wrap items-center gap-2"
+                        delete={{
+                            fn: deleteDDNSProfiles,
+                            id: selectedRows.map((r) => r.original.id),
+                            mutate: mutate,
+                        }}
+                    />
+                </Toolbar>
+                <DataTable
+                    table={table}
+                    columnCount={columns.length}
+                    isLoading={isLoading}
+                    empty={<EmptyState icon={Globe} />}
+                />
+            </Panel>
+        </Page>
     )
 }

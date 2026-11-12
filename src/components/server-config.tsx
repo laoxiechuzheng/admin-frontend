@@ -191,7 +191,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                 {menuItem ? (
                     <button
                         type="button"
-                        className="flex w-full items-center text-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground"
+                        className="flex w-full items-center rounded-md px-2 py-1.5 text-[13px] hover:bg-muted"
                         onClick={() => setOpen(true)}
                     >
                         <CogIcon className="h-4 w-4 mr-2" />
@@ -210,7 +210,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                         </DialogHeader>
                     </div>
                 ) : (
-                    <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                    <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
                         <div className="items-center mx-1">
                             <DialogHeader>
                                 <DialogTitle>{t("EditServerConfig")}</DialogTitle>
@@ -219,7 +219,7 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                             <Form {...form}>
                                 <form
                                     onSubmit={form.handleSubmit(onSubmit)}
-                                    className="space-y-2 my-2"
+                                    className="mt-5 space-y-4"
                                 >
                                     <FormField
                                         control={form.control}
@@ -314,19 +314,17 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                                             ))}
                                         </div>
                                     ))}
-                                    <DialogFooter className="justify-end">
+                                    <DialogFooter className="justify-end pt-2">
                                         <DialogClose asChild>
                                             <Button
                                                 type="button"
-                                                className="my-2"
+
                                                 variant="secondary"
                                             >
                                                 {t("Close")}
                                             </Button>
                                         </DialogClose>
-                                        <Button type="submit" className="my-2">
-                                            {t("Submit")}
-                                        </Button>
+                                        <Button type="submit">{t("Submit")}</Button>
                                     </DialogFooter>
                                 </form>
                             </Form>

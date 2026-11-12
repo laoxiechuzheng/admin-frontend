@@ -81,14 +81,14 @@ export const ProfileCard = ({ className }: { className: string }) => {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
                     <div className="items-center mx-1">
                         <DialogHeader>
                             <DialogTitle>{t("UpdateProfile")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
                                 <FormField
                                     control={form.control}
                                     name="new_username"
@@ -149,15 +149,13 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                     )}
                                 />
 
-                                <DialogFooter className="justify-end">
+                                <DialogFooter className="justify-end pt-2">
                                     <DialogClose asChild>
-                                        <Button type="button" className="my-2" variant="secondary">
+                                        <Button type="button" variant="secondary">
                                             {t("Close")}
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="my-2">
-                                        {t("Confirm")}
-                                    </Button>
+                                    <Button type="submit">{t("Confirm")}</Button>
                                 </DialogFooter>
                             </form>
                         </Form>

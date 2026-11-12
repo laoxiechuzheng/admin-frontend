@@ -2,22 +2,16 @@ import { swrFetcher } from "@/api/api"
 import { deleteNotification } from "@/api/notification"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { CopyButton } from "@/components/copy-button"
+import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
-import { NotificationTab } from "@/components/notification-tab"
 import { NotifierCard } from "@/components/notifier"
+import { EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { useNotification } from "@/hooks/useNotfication"
 import { selectableTableFeatures } from "@/lib/table"
 import { ModelNotification } from "@/types"
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, useTable } from "@tanstack/react-table"
+import { Send } from "lucide-react"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -74,7 +68,11 @@ export default function NotificationPage() {
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-32 whitespace-normal break-words">{s.name}</div>
+                return (
+                    <div className="max-w-56 whitespace-normal break-words font-medium text-foreground">
+                        {s.name}
+                    </div>
+                )
             },
         },
         {
@@ -136,66 +134,30 @@ export default function NotificationPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <div className="flex mt-6 mb-4">
-                <NotificationTab className="flex-1 mr-4 sm:max-w-[40%]" />
-                <HeaderButtonGroup
-                    className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
-                    delete={{
-                        fn: deleteNotification,
-                        id: selectedRows.map((r) => r.original.id),
-                        mutate: mutate,
-                    }}
-                >
-                    <NotifierCard mutate={mutate} />
-                </HeaderButtonGroup>
-            </div>
-
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id} className="text-sm">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
-                        </TableRow>
-                    ) : table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+        <Page>
+            <PageHeader
+                title={t("Shell.Notifier")}
+                description={t("Shell.Desc.Notifier")}
+                actions={<NotifierCard mutate={mutate} />}
+            />
+            <Panel>
+                <Toolbar selected={selectedRows.length}>
+                    <HeaderButtonGroup
+                        className="flex flex-wrap items-center gap-2"
+                        delete={{
+                            fn: deleteNotification,
+                            id: selectedRows.map((r) => r.original.id),
+                            mutate: mutate,
+                        }}
+                    />
+                </Toolbar>
+                <DataTable
+                    table={table}
+                    columnCount={columns.length}
+                    isLoading={isLoading}
+                    empty={<EmptyState icon={Send} />}
+                />
+            </Panel>
+        </Page>
     )
 }

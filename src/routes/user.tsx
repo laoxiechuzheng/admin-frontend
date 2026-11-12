@@ -1,21 +1,15 @@
 import { swrFetcher } from "@/api/api"
 import { deleteUser } from "@/api/user"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
-import { SettingsTab } from "@/components/settings-tab"
+import { EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { UserCard } from "@/components/user"
 import { selectableTableFeatures } from "@/lib/table"
 import { ModelUser } from "@/types"
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, useTable } from "@tanstack/react-table"
+import { Users } from "lucide-react"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -114,66 +108,30 @@ export default function UserPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3">
-            <SettingsTab className="mt-6 w-full" />
-            <div className="flex mt-4 mb-4">
-                <HeaderButtonGroup
-                    className="flex-2 flex gap-2 ml-auto"
-                    delete={{
-                        fn: deleteUser,
-                        id: selectedRows.map((r) => r.original.id),
-                        mutate: mutate,
-                    }}
-                >
-                    <UserCard mutate={mutate} />
-                </HeaderButtonGroup>
-            </div>
-
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id} className="text-sm">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
-                        </TableRow>
-                    ) : table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+        <Page>
+            <PageHeader
+                title={t("User")}
+                description={t("Shell.Desc.User")}
+                actions={<UserCard mutate={mutate} />}
+            />
+            <Panel>
+                <Toolbar selected={selectedRows.length}>
+                    <HeaderButtonGroup
+                        className="flex flex-wrap items-center gap-2"
+                        delete={{
+                            fn: deleteUser,
+                            id: selectedRows.map((r) => r.original.id),
+                            mutate: mutate,
+                        }}
+                    />
+                </Toolbar>
+                <DataTable
+                    table={table}
+                    columnCount={columns.length}
+                    isLoading={isLoading}
+                    empty={<EmptyState icon={Users} />}
+                />
+            </Panel>
+        </Page>
     )
 }

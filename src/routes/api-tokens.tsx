@@ -8,7 +8,8 @@ import {
     parseExpiresInDaysInput,
     parseServerIDsInput,
 } from "@/api/api-tokens"
-import { SettingsTab } from "@/components/settings-tab"
+import { EmptyState, Page, PageHeader, Panel } from "@/components/page"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     Table,
     TableBody,
@@ -31,6 +33,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
+import { KeyRound, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -70,86 +73,90 @@ export default function ApiTokensPage() {
     }
 
     return (
-        <div className="px-3">
-            <SettingsTab className="mt-6 w-full" />
+        <Page>
+            <PageHeader
+                title={t("ApiTokens")}
+                description={t("Shell.Desc.ApiTokens")}
+                actions={
+                    <Button onClick={() => setCreateOpen(true)}>
+                        <Plus />
+                        {t("CreateApiToken")}
+                    </Button>
+                }
+            />
 
-            <div className="flex mt-4 mb-4 items-center justify-between">
-                <h2 className="text-lg font-semibold">{t("ApiTokens")}</h2>
-                <Button onClick={() => setCreateOpen(true)}>{t("CreateApiToken")}</Button>
-            </div>
-
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t("Name")}</TableHead>
-                        <TableHead>{t("Scopes")}</TableHead>
-                        <TableHead>{t("ApiTokenServers")}</TableHead>
-                        <TableHead>{t("ApiTokenExpiresAt")}</TableHead>
-                        <TableHead>{t("ApiTokenLastUsed")}</TableHead>
-                        <TableHead>{t("Actions")}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
+            <Panel>
+                <Table className="min-w-[860px]">
+                    <TableHeader>
                         <TableRow>
-                            <TableCell colSpan={6} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
+                            <TableHead>{t("Name")}</TableHead>
+                            <TableHead>{t("Scopes")}</TableHead>
+                            <TableHead>{t("ApiTokenServers")}</TableHead>
+                            <TableHead>{t("ApiTokenExpiresAt")}</TableHead>
+                            <TableHead>{t("ApiTokenLastUsed")}</TableHead>
+                            <TableHead>{t("Actions")}</TableHead>
                         </TableRow>
-                    ) : !data || data.length === 0 ? (
-                        <TableRow>
-                            <TableCell
-                                colSpan={6}
-                                className="h-24 text-center text-muted-foreground"
-                            >
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
-                    ) : (
-                        data.map((tok) => (
-                            <TableRow key={tok.id}>
-                                <TableCell>{tok.name}</TableCell>
-                                <TableCell>
-                                    <div className="flex flex-wrap gap-1">
-                                        {(tok.scopes ?? []).map((s) => (
-                                            <span
-                                                key={s}
-                                                className="rounded bg-secondary px-1.5 py-0.5 text-xs"
-                                            >
-                                                {s}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="text-xs">
-                                    {tok.server_ids?.length
-                                        ? tok.server_ids.join(", ")
-                                        : t("ApiTokenAllServers")}
-                                </TableCell>
-                                <TableCell className="text-xs">
-                                    {tok.expires_at
-                                        ? new Date(tok.expires_at).toLocaleString()
-                                        : t("ApiTokenNever")}
-                                </TableCell>
-                                <TableCell className="text-xs">
-                                    {tok.last_used_at
-                                        ? `${new Date(tok.last_used_at).toLocaleString()} (${tok.last_used_ip ?? "?"})`
-                                        : t("ApiTokenNever")}
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDelete(tok.id, tok.name)}
-                                    >
-                                        {t("Revoke")}
-                                    </Button>
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={6}>
+                                    <Skeleton className="h-4 w-full max-w-[60%]" />
                                 </TableCell>
                             </TableRow>
-                        ))
-                    )}
-                </TableBody>
-            </Table>
+                        ) : !data || data.length === 0 ? (
+                            <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={6} className="p-0">
+                                    <EmptyState icon={KeyRound} />
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            data.map((tok) => (
+                                <TableRow key={tok.id}>
+                                    <TableCell className="font-medium">{tok.name}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-wrap gap-1">
+                                            {(tok.scopes ?? []).map((s) => (
+                                                <Badge
+                                                    key={s}
+                                                    variant="secondary"
+                                                    className="font-mono"
+                                                >
+                                                    {s}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs tabular">
+                                        {tok.server_ids?.length
+                                            ? tok.server_ids.join(", ")
+                                            : t("ApiTokenAllServers")}
+                                    </TableCell>
+                                    <TableCell className="text-xs tabular text-muted-foreground">
+                                        {tok.expires_at
+                                            ? new Date(tok.expires_at).toLocaleString()
+                                            : t("ApiTokenNever")}
+                                    </TableCell>
+                                    <TableCell className="text-xs tabular text-muted-foreground">
+                                        {tok.last_used_at
+                                            ? `${new Date(tok.last_used_at).toLocaleString()} (${tok.last_used_ip ?? "?"})`
+                                            : t("ApiTokenNever")}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => handleDelete(tok.id, tok.name)}
+                                        >
+                                            {t("Revoke")}
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </Panel>
 
             <CreateApiTokenDialog
                 open={createOpen}
@@ -162,7 +169,7 @@ export default function ApiTokensPage() {
             />
 
             <RevealedTokenDialog token={revealed} onClose={() => setRevealed(null)} />
-        </div>
+        </Page>
     )
 }
 
@@ -323,7 +330,7 @@ function RevealedTokenDialog({
                 </DialogHeader>
                 {token && (
                     <div className="space-y-3">
-                        <div className="rounded border border-amber-500/40 bg-amber-100 dark:bg-amber-950/40 p-3 text-sm">
+                        <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-[13px]">
                             {t("ApiTokenStoreSafely")}
                         </div>
                         <code className="block break-all rounded bg-muted p-3 font-mono text-xs">

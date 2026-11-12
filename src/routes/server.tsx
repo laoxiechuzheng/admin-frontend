@@ -3,13 +3,16 @@ import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
 import { CopyButton } from "@/components/copy-button"
+import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
 import { NoteMenu } from "@/components/note-menu"
+import { BoolCell, EmptyState, MonoCell, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { ServerCard } from "@/components/server"
 import { ServerConfigCard } from "@/components/server-config"
 import { ServerConfigCardBatch } from "@/components/server-config-batch"
 import { TerminalButton } from "@/components/terminal"
+import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     DropdownMenu,
@@ -17,20 +20,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { selectableTableFeatures } from "@/lib/table"
 import { joinIP } from "@/lib/utils"
 import { ModelServerTaskResponse, ModelServer as Server } from "@/types"
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, useTable } from "@tanstack/react-table"
+import { Server as ServerIcon } from "lucide-react"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -78,6 +74,12 @@ export default function ServerPage() {
             header: "ID",
             accessorKey: "id",
             accessorFn: (row) => `${row.id}(${row.display_index})`,
+            cell: ({ row }) => (
+                <MonoCell className="text-muted-foreground">
+                    {row.original.id}
+                    <span className="text-muted-foreground/60">({row.original.display_index})</span>
+                </MonoCell>
+            ),
         },
         {
             header: t("Name"),
@@ -85,7 +87,11 @@ export default function ServerPage() {
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
                 const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                return (
+                    <div className="max-w-40 whitespace-normal break-words font-medium text-foreground">
+                        {s.name}
+                    </div>
+                )
             },
         },
         {
@@ -96,6 +102,20 @@ export default function ServerPage() {
                     serverGroups
                         ?.filter((sg) => sg.servers?.includes(row.id))
                         .map((sg) => sg.group.id) || []
+                )
+            },
+            cell: ({ row }) => {
+                const groups =
+                    serverGroups?.filter((sg) => sg.servers?.includes(row.original.id)) || []
+                if (!groups.length) return <span className="text-muted-foreground">-</span>
+                return (
+                    <div className="flex max-w-48 flex-wrap gap-1">
+                        {groups.map((sg) => (
+                            <Badge key={sg.group.id} variant="secondary" title={`#${sg.group.id}`}>
+                                {sg.group.name}
+                            </Badge>
+                        ))}
+                    </div>
                 )
             },
         },
@@ -123,7 +143,7 @@ export default function ServerPage() {
                 const label = owner.username || t("UnknownUser", { id: owner.id })
                 return (
                     <div
-                        className="max-w-32 whitespace-normal break-words"
+                        className="max-w-48 whitespace-normal break-words"
                         title={`uid=${owner.id}`}
                     >
                         {label}
@@ -137,7 +157,7 @@ export default function ServerPage() {
             cell: ({ row }) => {
                 const s = row.original
                 return (
-                    <div className="max-w-24 whitespace-normal break-words">
+                    <div className="max-w-40 whitespace-normal break-words font-mono text-xs tabular">
                         {joinIP(s.geoip?.ip)}
                     </div>
                 )
@@ -147,16 +167,24 @@ export default function ServerPage() {
             header: t("Version"),
             accessorKey: "host.version",
             accessorFn: (row) => row.host.version || t("Unknown"),
+            cell: ({ row }) =>
+                row.original.host.version ? (
+                    <MonoCell>{row.original.host.version}</MonoCell>
+                ) : (
+                    <span className="text-muted-foreground">{t("Unknown")}</span>
+                ),
         },
         {
             header: t("EnableDDNS"),
             accessorKey: "enableDDNS",
             accessorFn: (row) => row.enable_ddns ?? false,
+            cell: ({ row }) => <BoolCell value={row.original.enable_ddns} />,
         },
         {
             header: t("HideForGuest"),
             accessorKey: "hideForGuest",
             accessorFn: (row) => row.hide_for_guest ?? false,
+            cell: ({ row }) => <BoolCell value={row.original.hide_for_guest} />,
         },
         {
             id: "note",
@@ -181,7 +209,7 @@ export default function ServerPage() {
                 const s = row.original
                 return (
                     <ActionButtonGroup
-                        className="flex gap-2"
+                        className="flex items-center gap-1.5"
                         delete={{ fn: deleteServer, id: s.id, mutate: mutate }}
                     >
                         <>
@@ -226,114 +254,80 @@ export default function ServerPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3 max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 mt-6 mb-4">
-                <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
-                <HeaderButtonGroup
-                    className="flex gap-2 flex-wrap shrink-0"
-                    delete={{
-                        fn: deleteServer,
-                        id: selectedRows.map((r) => r.original.id),
-                        mutate: mutate,
-                    }}
-                >
-                    <IconButton
-                        icon="update"
-                        onClick={async () => {
-                            const id = selectedRows.map((r) => r.original.id)
-                            if (id.length < 1) {
-                                toast(t("Error"), {
-                                    description: t("Results.SelectAtLeastOneServer"),
-                                })
-                                return
-                            }
-
-                            let resp: ModelServerTaskResponse = {}
-                            try {
-                                resp = await forceUpdateServer(id)
-                            } catch (e) {
-                                console.error(e)
-                                toast(t("Error"), {
-                                    description: t("Results.UnExpectedError"),
-                                })
-                                return
-                            }
-                            toast(t("Done"), {
-                                description:
-                                    t("Results.ForceUpdate") +
-                                    (resp.success?.length
-                                        ? t(`Success`) + ` [${resp.success.join(",")}]`
-                                        : "") +
-                                    (resp.failure?.length
-                                        ? t(`Failure`) + ` [${resp.failure.join(",")}]`
-                                        : "") +
-                                    (resp.offline?.length
-                                        ? t(`Offline`) + ` [${resp.offline.join(",")}]`
-                                        : ""),
-                            })
+        <Page>
+            <PageHeader
+                title={t("Server")}
+                description={t("Shell.Desc.Server")}
+                actions={<InstallCommandsMenu />}
+            />
+            <Panel>
+                <Toolbar selected={selectedRows.length}>
+                    <HeaderButtonGroup
+                        className="flex flex-wrap items-center gap-2"
+                        delete={{
+                            fn: deleteServer,
+                            id: selectedRows.map((r) => r.original.id),
+                            mutate: mutate,
                         }}
-                    />
-                    <BatchMoveServerIcon serverIds={selectedRows.map((r) => r.original.id)} />
-                    <ServerConfigCardBatch
-                        sid={selectedRows.map((r) => r.original.id)}
-                        className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"
-                    />
-                    <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
-                </HeaderButtonGroup>
-            </div>
-            <div className="rounded-md border overflow-x-auto">
-                <Table className="min-w-[960px]">
-                    <TableHeader className="sticky top-0 bg-background z-10">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id} className="text-sm">
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t("Loading")}...
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="text-xsm">
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t("NoResults")}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-        </div>
+                    >
+                        <IconButton
+                            icon="update"
+                            title={t("Shell.ForceUpdate")}
+                            aria-label={t("Shell.ForceUpdate")}
+                            onClick={async () => {
+                                const id = selectedRows.map((r) => r.original.id)
+                                if (id.length < 1) {
+                                    toast(t("Error"), {
+                                        description: t("Results.SelectAtLeastOneServer"),
+                                    })
+                                    return
+                                }
+
+                                let resp: ModelServerTaskResponse = {}
+                                try {
+                                    resp = await forceUpdateServer(id)
+                                } catch (e) {
+                                    console.error(e)
+                                    toast(t("Error"), {
+                                        description: t("Results.UnExpectedError"),
+                                    })
+                                    return
+                                }
+                                toast(t("Done"), {
+                                    description:
+                                        t("Results.ForceUpdate") +
+                                        (resp.success?.length
+                                            ? t(`Success`) + ` [${resp.success.join(",")}]`
+                                            : "") +
+                                        (resp.failure?.length
+                                            ? t(`Failure`) + ` [${resp.failure.join(",")}]`
+                                            : "") +
+                                        (resp.offline?.length
+                                            ? t(`Offline`) + ` [${resp.offline.join(",")}]`
+                                            : ""),
+                                })
+                            }}
+                        />
+                        <BatchMoveServerIcon
+                            serverIds={selectedRows.map((r) => r.original.id)}
+                            title={t("BatchMoveServer")}
+                            aria-label={t("BatchMoveServer")}
+                        />
+                        <ServerConfigCardBatch
+                            sid={selectedRows.map((r) => r.original.id)}
+                            title={t("EditServerConfig")}
+                            aria-label={t("EditServerConfig")}
+                        />
+                    </HeaderButtonGroup>
+                </Toolbar>
+                <DataTable
+                    table={table}
+                    columnCount={columns.length}
+                    isLoading={isLoading}
+                    minWidth={1040}
+                    empty={<EmptyState icon={ServerIcon} />}
+                />
+            </Panel>
+        </Page>
     )
 }

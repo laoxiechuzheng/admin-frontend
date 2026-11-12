@@ -1,8 +1,9 @@
 import { swrFetcher } from "@/api/api"
 import { deleteWAF } from "@/api/waf"
 import { ActionButtonGroup } from "@/components/action-button-group"
+import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
-import { SettingsTab } from "@/components/settings-tab"
+import { EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     Pagination,
@@ -13,14 +14,6 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
 import { selectableTableFeatures } from "@/lib/table"
 import {
@@ -29,7 +22,8 @@ import {
     wafBlockIdentifiers,
     wafBlockReasons,
 } from "@/types"
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, useTable } from "@tanstack/react-table"
+import { ShieldAlert } from "lucide-react"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
@@ -208,11 +202,11 @@ export default function WAFPage() {
         }
 
         return (
-            <div className="flex items-center justify-between px-2 py-4">
-                <div className="text-sm text-muted-foreground">
+            <div className="flex items-center justify-between gap-3 border-t px-4 py-2.5">
+                <div className="whitespace-nowrap text-xs text-muted-foreground tabular">
                     {t("Total")}: {total}
                 </div>
-                <Pagination>
+                <Pagination className="mx-0 w-auto justify-end">
                     <PaginationContent>
                         <PaginationItem>
                             <PaginationPrevious
@@ -257,68 +251,29 @@ export default function WAFPage() {
     }
 
     return (
-        <div className="px-3">
-            <SettingsTab className="mt-6 w-full" />
-            <div className="flex mt-4 mb-4">
-                {isAdmin && (
-                    <HeaderButtonGroup
-                        className="flex-2 flex gap-2 ml-auto"
-                        delete={{
-                            fn: deleteWAF,
-                            id: selectedRows.map((r) => r.original.ip || ""),
-                            mutate: mutate,
-                        }}
-                    >
-                        <></>
-                    </HeaderButtonGroup>
-                )}
-            </div>
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id} className="text-sm">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("Loading")}...
-                            </TableCell>
-                        </TableRow>
-                    ) : table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className="text-xsm">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
-                        </TableRow>
+        <Page>
+            <PageHeader title={t("WAF")} description={t("Shell.Desc.WAF")} />
+            <Panel>
+                <Toolbar selected={selectedRows.length}>
+                    {isAdmin && (
+                        <HeaderButtonGroup
+                            className="flex flex-wrap items-center gap-2"
+                            delete={{
+                                fn: deleteWAF,
+                                id: selectedRows.map((r) => r.original.ip || ""),
+                                mutate: mutate,
+                            }}
+                        />
                     )}
-                </TableBody>
-            </Table>
-            {renderPagination()}
-        </div>
+                </Toolbar>
+                <DataTable
+                    table={table}
+                    columnCount={columns.length}
+                    isLoading={isLoading}
+                    empty={<EmptyState icon={ShieldAlert} />}
+                />
+                {renderPagination()}
+            </Panel>
+        </Page>
     )
 }

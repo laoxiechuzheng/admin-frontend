@@ -49,7 +49,7 @@ export function ActionButtonGroup<E, U>({
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="trash" className="text-white" />
+                    <IconButton variant="destructive" icon="trash" />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
@@ -61,10 +61,7 @@ export function ActionButtonGroup<E, U>({
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                         <AlertDialogAction
-                            className={buttonVariants({
-                                variant: "destructive",
-                                className: "text-white",
-                            })}
+                            className={buttonVariants({ variant: "destructive" })}
                             onClick={handleDelete}
                         >
                             {t("Confirm")}
@@ -98,7 +95,7 @@ export function BlockButtonGroup<E, U>({
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="ban" className="text-white" />
+                    <IconButton variant="destructive" icon="ban" />
                 </AlertDialogTrigger>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
@@ -110,10 +107,7 @@ export function BlockButtonGroup<E, U>({
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("Close")}</AlertDialogCancel>
                         <AlertDialogAction
-                            className={buttonVariants({
-                                variant: "destructive",
-                                className: "text-white",
-                            })}
+                            className={buttonVariants({ variant: "destructive" })}
                             onClick={handleBlock}
                         >
                             {t("Confirm")}

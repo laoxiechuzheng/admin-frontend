@@ -1,5 +1,6 @@
 import { swrFetcher } from "@/api/api"
 import { cancelServerTransfer, retryServerTransfer } from "@/api/transfer"
+import { EmptyState, Page, PageHeader, Panel } from "@/components/page"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +21,7 @@ import {
     ModelServerTransferStatusTimeout,
     ModelServerTransferStatusVerified,
 } from "@/types"
+import { ArrowLeftRight } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -31,10 +33,13 @@ import useSWR from "swr"
 // the operator's attention. Cancelled is "outline" — soft signal, expected.
 const statusMeta: Record<
     ModelServerTransferStatus,
-    { key: string; variant: "default" | "secondary" | "destructive" | "outline" }
+    {
+        key: string
+        variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning"
+    }
 > = {
-    [ModelServerTransferStatusPending]: { key: "Transfer.StatusPending", variant: "default" },
-    [ModelServerTransferStatusVerified]: { key: "Transfer.StatusVerified", variant: "secondary" },
+    [ModelServerTransferStatusPending]: { key: "Transfer.StatusPending", variant: "warning" },
+    [ModelServerTransferStatusVerified]: { key: "Transfer.StatusVerified", variant: "success" },
     [ModelServerTransferStatusFailed]: { key: "Transfer.StatusFailed", variant: "destructive" },
     [ModelServerTransferStatusTimeout]: { key: "Transfer.StatusTimeout", variant: "destructive" },
     [ModelServerTransferStatusCancelled]: { key: "Transfer.StatusCancelled", variant: "outline" },
@@ -177,81 +182,95 @@ export default function TransferPage() {
     const rows = useMemo(() => data ?? [], [data])
 
     return (
-        <div className="px-3">
-            <h1 className="mt-6 text-2xl font-semibold">{t("Transfer.Title")}</h1>
-            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{t("Transfer.PageHint")}</p>
-            <Table className="mt-6">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>{t("ServerID")}</TableHead>
-                        <TableHead>{t("Transfer.From")}</TableHead>
-                        <TableHead>{t("Transfer.To")}</TableHead>
-                        <TableHead>{t("Transfer.Initiator")}</TableHead>
-                        <TableHead>{t("Status")}</TableHead>
-                        <TableHead>{t("Transfer.LastError")}</TableHead>
-                        <TableHead>{t("CreatedAt")}</TableHead>
-                        <TableHead>{t("Actions")}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {rows.length === 0 ? (
+        <Page>
+            <PageHeader title={t("Transfer.Title")} description={t("Transfer.PageHint")} />
+            <Panel>
+                <Table className="min-w-[960px]">
+                    <TableHeader>
                         <TableRow>
-                            <TableCell colSpan={9} className="h-24 text-center">
-                                {t("NoResults")}
-                            </TableCell>
+                            <TableHead>ID</TableHead>
+                            <TableHead>{t("ServerID")}</TableHead>
+                            <TableHead>{t("Transfer.From")}</TableHead>
+                            <TableHead>{t("Transfer.To")}</TableHead>
+                            <TableHead>{t("Transfer.Initiator")}</TableHead>
+                            <TableHead>{t("Status")}</TableHead>
+                            <TableHead>{t("Transfer.LastError")}</TableHead>
+                            <TableHead>{t("CreatedAt")}</TableHead>
+                            <TableHead>{t("Actions")}</TableHead>
                         </TableRow>
-                    ) : (
-                        rows.map((row) => {
-                            const meta = statusMeta[row.status]
-                            const isPending = row.status === ModelServerTransferStatusPending
-                            const isTerminalRevert =
-                                row.status === ModelServerTransferStatusFailed ||
-                                row.status === ModelServerTransferStatusTimeout ||
-                                row.status === ModelServerTransferStatusCancelled
-                            return (
-                                <TableRow key={row.id}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.server_id}</TableCell>
-                                    <TableCell>{row.from_user_id}</TableCell>
-                                    <TableCell>{row.to_user_id}</TableCell>
-                                    <TableCell>{row.initiator_id}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={meta.variant}>{t(meta.key)}</Badge>
-                                    </TableCell>
-                                    <TableCell className="max-w-xs truncate" title={row.last_error}>
-                                        {row.last_error || "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {new Date(row.created_at).toLocaleString()}
-                                    </TableCell>
-                                    <TableCell className="space-x-2">
-                                        {isPending &&
-                                            (isAdmin || row.from_user_id === callerID) && (
+                    </TableHeader>
+                    <TableBody>
+                        {rows.length === 0 ? (
+                            <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={9} className="p-0">
+                                    <EmptyState icon={ArrowLeftRight} />
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            rows.map((row) => {
+                                const meta = statusMeta[row.status]
+                                const isPending = row.status === ModelServerTransferStatusPending
+                                const isTerminalRevert =
+                                    row.status === ModelServerTransferStatusFailed ||
+                                    row.status === ModelServerTransferStatusTimeout ||
+                                    row.status === ModelServerTransferStatusCancelled
+                                return (
+                                    <TableRow key={row.id}>
+                                        <TableCell className="font-mono text-xs tabular text-muted-foreground">
+                                            {row.id}
+                                        </TableCell>
+                                        <TableCell className="font-mono text-xs tabular">
+                                            {row.server_id}
+                                        </TableCell>
+                                        <TableCell className="font-mono text-xs tabular">
+                                            {row.from_user_id}
+                                        </TableCell>
+                                        <TableCell className="font-mono text-xs tabular">
+                                            {row.to_user_id}
+                                        </TableCell>
+                                        <TableCell className="font-mono text-xs tabular">
+                                            {row.initiator_id}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={meta.variant}>{t(meta.key)}</Badge>
+                                        </TableCell>
+                                        <TableCell
+                                            className="max-w-xs truncate"
+                                            title={row.last_error}
+                                        >
+                                            {row.last_error || "-"}
+                                        </TableCell>
+                                        <TableCell className="whitespace-nowrap text-xs tabular text-muted-foreground">
+                                            {new Date(row.created_at).toLocaleString()}
+                                        </TableCell>
+                                        <TableCell className="space-x-2">
+                                            {isPending &&
+                                                (isAdmin || row.from_user_id === callerID) && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => onCancel(row.id)}
+                                                    >
+                                                        {t("Cancel")}
+                                                    </Button>
+                                                )}
+                                            {isTerminalRevert && isAdmin && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => onCancel(row.id)}
+                                                    onClick={() => onRetry(row.id)}
                                                 >
-                                                    {t("Cancel")}
+                                                    {t("Transfer.Retry")}
                                                 </Button>
                                             )}
-                                        {isTerminalRevert && isAdmin && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => onRetry(row.id)}
-                                            >
-                                                {t("Transfer.Retry")}
-                                            </Button>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        )}
+                    </TableBody>
+                </Table>
+            </Panel>
+        </Page>
     )
 }

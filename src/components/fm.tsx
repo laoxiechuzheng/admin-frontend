@@ -333,7 +333,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
     const [gotoPath, setGotoPath] = useState("")
     return (
         <div ref={fmRef} {...props}>
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex items-center gap-2">
                 <AlertDialog>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -389,7 +389,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
-                <h1 className="text-base">{t("FileManager")}</h1>
+                <h1 className="text-sm font-semibold">{t("FileManager")}</h1>
                 <div className="ml-auto">
                     <input
                         ref={fileInputRef}
@@ -470,7 +470,7 @@ export const FMCard = ({ id }: { id?: string }) => {
             <SheetTrigger asChild>
                 <IconButton icon="folder-closed" onClick={fetchFM} />
             </SheetTrigger>
-            <SheetContent setOpen={setOpen} className="min-w-[35%]">
+            <SheetContent setOpen={setOpen} className="min-w-[35%] border-l">
                 <div className="overflow-auto">
                     <SheetTitle />
                     <SheetHeader className="pb-2">

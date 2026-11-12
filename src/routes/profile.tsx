@@ -1,23 +1,24 @@
 import { Oauth2RequestType, getOauth2RedirectURL, unbindOauth2 } from "@/api/oauth2"
 import { getProfile } from "@/api/user"
+import { EmptyState, Page, PageHeader } from "@/components/page"
 import { ProfileCard } from "@/components/profile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { OAuthProviderIcon } from "@/components/ui/icon"
 import { useMainStore } from "@/hooks/useMainStore"
-import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { useServer } from "@/hooks/useServer"
 import useSetting from "@/hooks/useSetting"
 import { Boxes, Server } from "lucide-react"
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 export default function ProfilePage() {
     const { profile, setProfile } = useMainStore()
     const { servers, serverGroups } = useServer()
     const { data: settingData } = useSetting()
-    const isDesktop = useMediaQuery("(min-width: 890px)")
+    const { t } = useTranslation()
 
     useEffect(() => {
         const oauth2 = new URLSearchParams(window.location.search).get("oauth2")
@@ -48,106 +49,121 @@ export default function ProfilePage() {
         }
     }
 
+    const isAdmin = profile?.role === 0
+
     return (
         profile && (
-            <div className={`flex p-8 gap-4 ${isDesktop ? "ml-6" : "flex-col"}`}>
-                <div
-                    className={`flex ${isDesktop ? "flex-col mr-6" : "gap-4 w-full items-center"}`}
-                >
-                    <Avatar
-                        className={`${isDesktop ? "h-[300px] w-[300px]" : "h-[150px] w-[150px]"} border-foreground border-[1px]`}
-                    >
-                        <AvatarImage
-                            src={
-                                "https://api.dicebear.com/7.x/notionists/svg?seed=" +
-                                profile.username
-                            }
-                            alt={profile.username}
-                        />
-                        <AvatarFallback>{profile.username}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="justify-center text-3xl font-semibold">{profile.username}</p>
-                        <p className="text-gray-400">IP: {profile.login_ip || "Unknown"}</p>
-                    </div>
-                    {isDesktop && (
-                        <ProfileCard className="flex mt-4 justify-center items-center max-w-[300px] rounded-lg" />
-                    )}
-                </div>
-                {!isDesktop && (
-                    <ProfileCard className="flex justify-center items-center max-w-full rounded-lg" />
-                )}
-                <div className="w-full">
-                    <div className="flex flex-col gap-4">
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle className="flex gap-2 text-xl items-center">
-                                    <Server /> Servers
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-lg font-semibold">
-                                {servers?.length || 0}
-                            </CardContent>
-                        </Card>
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle className="flex gap-2 text-xl items-center">
-                                    <Boxes /> Server Groups
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-lg font-semibold">
-                                {serverGroups?.length || 0}
-                            </CardContent>
-                        </Card>
-
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle className="flex gap-2 text-xl items-center">
-                                    <Boxes /> Oauth2 bindings
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-lg font-semibold">
-                                {settingData?.config?.oauth2_providers?.map((provider) => (
-                                    <div
-                                        key={provider}
-                                        className="flex justify-between items-center flex-wrap gap-2"
-                                    >
-                                        <section className="flex gap-2 items-center">
-                                            <OAuthProviderIcon
-                                                provider={provider}
-                                                className="size-4 text-muted-foreground"
-                                            />
-                                            <p>{provider}: </p>
-                                            {profile.oauth2_bind?.[provider.toLowerCase()] && (
-                                                <p className=" bg-muted px-1.5 py-0.5 text-sm rounded-full">
-                                                    {profile.oauth2_bind?.[provider.toLowerCase()]}
-                                                </p>
+            <Page className="max-w-[1100px]">
+                <PageHeader title={t("Profile")} description={t("Shell.Desc.Profile")} />
+                <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+                    <section className="rounded-lg border bg-card p-5">
+                        <div className="flex items-center gap-4">
+                            <Avatar className="h-16 w-16 border">
+                                <AvatarImage
+                                    src={
+                                        "https://api.dicebear.com/7.x/notionists/svg?seed=" +
+                                        profile.username
+                                    }
+                                    alt={profile.username}
+                                />
+                                <AvatarFallback>{profile.username}</AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                                <p className="truncate text-lg font-semibold text-foreground">
+                                    {profile.username}
+                                </p>
+                                <Badge variant={isAdmin ? "default" : "secondary"} className="mt-1">
+                                    {isAdmin ? t("Shell.Admin") : t("Shell.Member")}
+                                </Badge>
+                            </div>
+                        </div>
+                        <dl className="mt-5 space-y-2 border-t pt-4 text-[13px]">
+                            <div className="flex items-center justify-between gap-3">
+                                <dt className="text-muted-foreground">{t("Shell.LoginIP")}</dt>
+                                <dd className="truncate font-mono text-xs tabular">
+                                    {profile.login_ip || "Unknown"}
+                                </dd>
+                            </div>
+                        </dl>
+                        <ProfileCard className="mt-5 w-full" />
+                    </section>
+                    <div className="flex min-w-0 flex-col gap-5">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="rounded-lg border bg-card p-4">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Server className="h-3.5 w-3.5" />
+                                    {t("Server")}
+                                </div>
+                                <div className="mt-2 text-3xl font-semibold tabular text-foreground">
+                                    {servers?.length || 0}
+                                </div>
+                            </div>
+                            <div className="rounded-lg border bg-card p-4">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Boxes className="h-3.5 w-3.5" />
+                                    {t("Shell.ServerGroup")}
+                                </div>
+                                <div className="mt-2 text-3xl font-semibold tabular text-foreground">
+                                    {serverGroups?.length || 0}
+                                </div>
+                            </div>
+                        </div>
+                        <section className="rounded-lg border bg-card">
+                            <div className="border-b px-5 py-3.5">
+                                <h2 className="text-sm font-semibold">
+                                    {t("Shell.OAuth2Bindings")}
+                                </h2>
+                            </div>
+                            {settingData?.config?.oauth2_providers?.length ? (
+                                <ul className="divide-y">
+                                    {settingData?.config?.oauth2_providers?.map((provider) => (
+                                        <li
+                                            key={provider}
+                                            className="flex flex-wrap items-center justify-between gap-2 px-5 py-3"
+                                        >
+                                            <section className="flex items-center gap-2 text-[13px]">
+                                                <OAuthProviderIcon
+                                                    provider={provider}
+                                                    className="size-4 text-muted-foreground"
+                                                />
+                                                <p className="font-medium">{provider}</p>
+                                                {profile.oauth2_bind?.[provider.toLowerCase()] ? (
+                                                    <Badge variant="success">
+                                                        {
+                                                            profile.oauth2_bind?.[
+                                                                provider.toLowerCase()
+                                                            ]
+                                                        }
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="neutral">
+                                                        {t("Shell.NotBound")}
+                                                    </Badge>
+                                                )}
+                                            </section>
+                                            {profile.oauth2_bind?.[provider.toLowerCase()] ? (
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => unbindO2(provider)}
+                                                >
+                                                    {t("Shell.Unbind")}
+                                                </Button>
+                                            ) : (
+                                                <Button size="sm" onClick={() => bindO2(provider)}>
+                                                    {t("Shell.Bind")}
+                                                </Button>
                                             )}
-                                        </section>
-                                        {profile.oauth2_bind?.[provider.toLowerCase()] ? (
-                                            <Button
-                                                className="w-fit bg-red-600 hover:bg-red-500 dark:text-white rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] my-1"
-                                                size="sm"
-                                                onClick={() => unbindO2(provider)}
-                                            >
-                                                Unbind
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                className="my-1"
-                                                size="sm"
-                                                onClick={() => bindO2(provider)}
-                                            >
-                                                Bind
-                                            </Button>
-                                        )}
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <EmptyState icon={Boxes} />
+                            )}
+                        </section>
                     </div>
                 </div>
-            </div>
+            </Page>
         )
     )
 }
