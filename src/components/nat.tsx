@@ -19,8 +19,8 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { IconButton } from "@/components/xui/icon-button"
+import "@/styles/forms.css"
 import { ModelNAT } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
@@ -30,6 +30,7 @@ import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 import { Checkbox } from "./ui/checkbox"
 import { Label } from "./ui/label"
 
@@ -100,15 +101,15 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="md">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>{data ? t("EditNAT") : t("CreateNAT")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.basic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -143,11 +144,13 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                         )
                                     }}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.network")}>
                                 <FormField
                                     control={form.control}
                                     name="host"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("LocalService")}</FormLabel>
                                             <FormControl>
                                                 <Input
@@ -163,7 +166,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="domain"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("BindHostname")}</FormLabel>
                                             <FormControl>
                                                 <Input
@@ -179,7 +182,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="enabled"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -193,18 +196,19 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

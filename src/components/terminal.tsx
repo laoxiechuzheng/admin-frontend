@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import useTerminal from "@/hooks/useTerminal"
 import { type TerminalKey, controlSequenceForInput, terminalKeySequence } from "@/lib/terminal-keys"
+import "@/styles/forms.css"
 import { FitAddon } from "@xterm/addon-fit"
 import { Terminal } from "@xterm/xterm"
 import "@xterm/xterm/css/xterm.css"
@@ -33,6 +34,7 @@ import { IconButton } from "./xui/icon-button"
 interface XtermProps {
     wsUrl: string
     setClose: React.Dispatch<React.SetStateAction<boolean>>
+    onConnectionStateChange?: (state: ConnectionState) => void
 }
 
 type ConnectionState = "connecting" | "connected" | "disconnected"
@@ -53,7 +55,7 @@ const terminalKeys: Array<{ key: TerminalKey; label: string; ariaLabel: string }
 const maxClipboardBytes = 512 * 1024
 
 export const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.IntrinsicElements["div"]>(
-    ({ wsUrl, setClose, className = "", ...props }, ref) => {
+    ({ wsUrl, setClose, onConnectionStateChange, className = "", ...props }, ref) => {
         const shellRef = useRef<HTMLDivElement>(null)
         const screenRef = useRef<HTMLDivElement>(null)
         const terminalRef = useRef<Terminal | null>(null)
@@ -67,6 +69,15 @@ export const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.Intrin
         const [controlActive, setControlActive] = useState(false)
         const [pasteBusy, setPasteBusy] = useState(false)
         const [connectionState, setConnectionState] = useState<ConnectionState>("connecting")
+        const connectionStateCallbackRef = useRef(onConnectionStateChange)
+
+        useEffect(() => {
+            connectionStateCallbackRef.current = onConnectionStateChange
+        }, [onConnectionStateChange])
+
+        useEffect(() => {
+            connectionStateCallbackRef.current?.(connectionState)
+        }, [connectionState])
 
         useImperativeHandle(ref, () => shellRef.current!, [])
 
@@ -341,43 +352,64 @@ export const XtermComponent = forwardRef<HTMLDivElement, XtermProps & JSX.Intrin
 )
 
 export const TerminalPage = () => {
+    const { t } = useTranslation()
     const { id } = useParams<{ id: string }>()
     const [open, setOpen] = useState(false)
+    const [connectionState, setConnectionState] = useState<ConnectionState>("connecting")
     const terminal = useTerminal(id ? parseInt(id) : undefined)
     const terminalIdRef = useRef<HTMLDivElement>(null)
     return (
         <div className="terminal-page mx-auto w-full max-w-[1400px] px-3 sm:px-6 lg:px-8">
-            <div className="mb-3 mt-4 flex items-center gap-3 sm:mb-4 sm:mt-6">
-                <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
-                        <TerminalIcon className="h-4 w-4" />
+            <section className="surface fs-terminal-frame">
+                <div className="fs-terminal-head">
+                    <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
+                            <TerminalIcon className="h-4 w-4" />
+                        </span>
+                        <h1
+                            className="truncate text-lg font-semibold leading-tight sm:text-xl"
+                            title={terminal?.server_name || `Terminal (${id})`}
+                        >
+                            {terminal?.server_name || `Terminal (${id})`}
+                        </h1>
+                    </div>
+                    <span
+                        role="status"
+                        className="chip fs-terminal-status"
+                        data-tone={
+                            connectionState === "connected"
+                                ? "success"
+                                : connectionState === "connecting"
+                                  ? "warning"
+                                  : "danger"
+                        }
+                    >
+                        {t(`v2Forms.terminal.${connectionState}`)}
                     </span>
-                    <h1 className="truncate text-lg font-semibold leading-tight sm:text-xl">
-                        {`Terminal (${id})`}
-                    </h1>
+                    <div className="ml-auto flex shrink-0 gap-2">
+                        <IconButton
+                            icon="expand"
+                            onClick={async () => {
+                                await terminalIdRef.current?.requestFullscreen()
+                            }}
+                        />
+                        <FMCard id={id} />
+                    </div>
                 </div>
-                <div className="ml-auto flex shrink-0 gap-2">
-                    <IconButton
-                        icon="expand"
-                        onClick={async () => {
-                            await terminalIdRef.current?.requestFullscreen()
-                        }}
+                {terminal?.session_id ? (
+                    <XtermComponent
+                        ref={terminalIdRef}
+                        className="mb-3 sm:mb-5"
+                        wsUrl={`/api/v1/ws/terminal/${terminal.session_id}`}
+                        setClose={setOpen}
+                        onConnectionStateChange={setConnectionState}
                     />
-                    <FMCard id={id} />
-                </div>
-            </div>
-            {terminal?.session_id ? (
-                <XtermComponent
-                    ref={terminalIdRef}
-                    className="mb-3 sm:mb-5"
-                    wsUrl={`/api/v1/ws/terminal/${terminal.session_id}`}
-                    setClose={setOpen}
-                />
-            ) : (
-                <div className="rounded-lg border bg-card px-5 py-10 text-center text-[13px] text-muted-foreground">
-                    The server does not exist, or have not been connected yet.
-                </div>
-            )}
+                ) : (
+                    <div className="fs-terminal-empty">
+                        The server does not exist, or have not been connected yet.
+                    </div>
+                )}
+            </section>
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>

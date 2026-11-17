@@ -43,7 +43,8 @@ export const NoteMenu = forwardRef<HTMLButtonElement, NoteMenuProps>((props, ref
                 <IconButton
                     {...props}
                     ref={ref}
-                    variant="outline"
+                    variant="ghost"
+                    aria-label={props["aria-label"] ?? t("Copy")}
                     size="icon"
                     icon={copy ? "check" : "clipboard"}
                 />

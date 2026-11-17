@@ -21,10 +21,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelServerTaskResponse } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CogIcon } from "lucide-react"
@@ -33,6 +33,8 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
+
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 
 const agentConfigSchema = z.object({
     debug: asOptionalField(z.boolean()),
@@ -201,26 +203,23 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                     <IconButton {...props} icon="cog" />
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent variant="sheet" size="md">
                 {loading ? (
-                    <div className="items-center mx-1">
-                        <DialogHeader>
-                            <DialogTitle>Loading...</DialogTitle>
+                    <div className="fs-loading">
+                        <DialogHeader className="fs-sheet-head">
+                            <DialogTitle>{t("Loading")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
                     </div>
                 ) : (
-                    <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                        <div className="items-center mx-1">
-                            <DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                            <DialogHeader className="fs-sheet-head">
                                 <DialogTitle>{t("EditServerConfig")}</DialogTitle>
                                 <DialogDescription />
                             </DialogHeader>
-                            <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit(onSubmit)}
-                                    className="mt-5 space-y-4"
-                                >
+                            <div className="fs-sheet-body">
+                                <FormSheetSection title={t("v2Forms.sections.reporting")}>
                                     <FormField
                                         control={form.control}
                                         name="ip_report_period"
@@ -255,16 +254,21 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                                             </FormItem>
                                         )}
                                     />
+                                </FormSheetSection>
+                                <FormSheetSection title={t("v2Forms.sections.allowlists")}>
                                     <FormField
                                         control={form.control}
                                         name="hard_drive_partition_allowlist_raw"
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className="fs-span-2">
                                                 <FormLabel>
                                                     hard_drive_partition_allowlist
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Textarea className="resize-y" {...field} />
+                                                    <Textarea
+                                                        className="fs-code resize-y"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -274,24 +278,29 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                                         control={form.control}
                                         name="nic_allowlist_raw"
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className="fs-span-2">
                                                 <FormLabel>nic_allowlist</FormLabel>
                                                 <FormControl>
-                                                    <Textarea className="resize-y" {...field} />
+                                                    <Textarea
+                                                        className="fs-code resize-y"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
+                                </FormSheetSection>
+                                <FormSheetSection title={t("v2Forms.sections.capabilities")}>
                                     {groupedBoolFields.map((group, idx) => (
-                                        <div className="flex gap-8" key={idx}>
+                                        <div className="fs-grid fs-span-2" key={idx}>
                                             {group.map((field) => (
                                                 <FormField
                                                     key={field}
                                                     control={form.control}
                                                     name={field}
                                                     render={({ field: controllerField }) => (
-                                                        <FormItem className="flex items-center w-full">
+                                                        <FormItem className="fs-check flex items-center w-full">
                                                             <FormControl>
                                                                 <div className="flex items-center gap-2">
                                                                     <Checkbox
@@ -314,22 +323,23 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
                                             ))}
                                         </div>
                                     ))}
-                                    <DialogFooter className="justify-end pt-2">
-                                        <DialogClose asChild>
-                                            <Button
-                                                type="button"
+                                </FormSheetSection>
+                            </div>
+                            <DialogFooter className="fs-sheet-foot">
+                                <FormDirtyHint />
+                                <DialogClose asChild>
+                                    <Button
+                                        type="button"
 
-                                                variant="secondary"
-                                            >
-                                                {t("Close")}
-                                            </Button>
-                                        </DialogClose>
-                                        <Button type="submit">{t("Submit")}</Button>
-                                    </DialogFooter>
-                                </form>
-                            </Form>
-                        </div>
-                    </ScrollArea>
+                                        variant="secondary"
+                                    >
+                                        {t("Close")}
+                                    </Button>
+                                </DialogClose>
+                                <Button type="submit">{t("Submit")}</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 )}
             </DialogContent>
         </Dialog>

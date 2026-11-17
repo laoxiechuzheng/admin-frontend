@@ -1,0 +1,13 @@
+{
+    "v2Pages": {
+        "table": { "selectedPage": "本页已选 {{count}} 项" },
+        "settings": { "unsaved": "有未保存更改", "sections": "设置分节" },
+        "error": {
+            "title": "无法加载记录",
+            "description": "已显示的数据会保留，请重试。",
+            "retry": "重试"
+        },
+        "actions": { "runTask": "执行任务" },
+        "transfer": { "connecting": "连接中", "connected": "已连接", "reconnecting": "重连中" }
+    }
+}

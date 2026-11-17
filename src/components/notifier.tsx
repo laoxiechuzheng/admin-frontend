@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -31,6 +30,7 @@ import {
 } from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelNotification } from "@/types"
 import { nrequestMethods, nrequestTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -41,6 +41,7 @@ import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 import { Textarea } from "./ui/textarea"
 
 interface NotifierCardProps {
@@ -124,17 +125,17 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="md">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>
                                 {data ? t("EditNotifier") : t("CreateNotifier")}
                             </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.basic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -152,7 +153,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="url"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>URL</FormLabel>
                                             <FormControl>
                                                 <Input {...field} />
@@ -161,6 +162,8 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.webhook")}>
                                 <FormField
                                     control={form.control}
                                     name="request_method"
@@ -221,7 +224,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="request_header"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("RequestHeader")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
@@ -238,7 +241,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="request_body"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("RequestBody")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
@@ -251,11 +254,13 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.advanced")}>
                                 <FormField
                                     control={form.control}
                                     name="verify_tls"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -275,7 +280,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="skip_check"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -295,7 +300,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="format_metric_units"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -311,18 +316,19 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

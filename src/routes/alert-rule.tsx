@@ -2,7 +2,6 @@ import { deleteAlertRules } from "@/api/alert-rule"
 import { swrFetcher } from "@/api/api"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { AlertRuleCard } from "@/components/alert-rule"
-import { CopyButton } from "@/components/copy-button"
 import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { BoolCell, EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
@@ -15,6 +14,8 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
+
+import { CopyValue, PageErrorNotice, mobileColumns } from "./lumen-page-parts"
 
 export default function AlertRulePage() {
     const { t } = useTranslation()
@@ -84,12 +85,17 @@ export default function AlertRulePage() {
             header: t("TriggerMode"),
             accessorKey: "trigger Mode",
             accessorFn: (row) => triggerModes[row.trigger_mode] || "",
+            cell: ({ row }) => (
+                <span className="chip pg-type" data-tone="neutral">
+                    {triggerModes[row.original.trigger_mode] || ""}
+                </span>
+            ),
         },
         {
             header: t("Rules"),
             cell: ({ row }) => {
                 const s = row.original
-                return <CopyButton text={JSON.stringify(s.rules)} />
+                return <CopyValue value={JSON.stringify(s.rules)} />
             },
         },
         {
@@ -136,18 +142,23 @@ export default function AlertRulePage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", [
+            t("Rules"),
+            "failTriggerTasks",
+            "recoverTriggerTasks",
+        ]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("AlertRule")}
                 description={t("Shell.Desc.AlertRule")}
                 actions={<AlertRuleCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

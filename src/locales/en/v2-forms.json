@@ -1,0 +1,32 @@
+{
+    "v2Forms": {
+        "unsaved": "Unsaved changes",
+        "sections": {
+            "basic": "Basics",
+            "advanced": "Advanced",
+            "notify": "Notifications",
+            "credentials": "Credentials",
+            "probe": "Probe and detection",
+            "coverage": "Server coverage",
+            "trigger": "Trigger tasks",
+            "webhook": "Webhook",
+            "network": "Network",
+            "execution": "Execution",
+            "rules": "Rules",
+            "notes": "Notes",
+            "reporting": "Status reporting",
+            "allowlists": "Collection scope",
+            "capabilities": "Agent capabilities",
+            "members": "Group members",
+            "account": "Account",
+            "security": "Security",
+            "transfer": "Transfer target"
+        },
+        "durationSeconds": "Duration (seconds)",
+        "terminal": {
+            "connecting": "Connecting",
+            "connected": "Connected",
+            "disconnected": "Disconnected"
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "v2Forms": {
+        "unsaved": "有未保存更改",
+        "sections": {
+            "basic": "基础",
+            "advanced": "高级",
+            "notify": "通知",
+            "credentials": "凭据",
+            "probe": "探测与判定",
+            "coverage": "覆盖服务器",
+            "trigger": "触发任务",
+            "webhook": "Webhook",
+            "network": "网络",
+            "execution": "执行内容",
+            "rules": "规则",
+            "notes": "备注",
+            "reporting": "状态上报",
+            "allowlists": "采集范围",
+            "capabilities": "Agent 功能",
+            "members": "分组成员",
+            "account": "账户",
+            "security": "安全",
+            "transfer": "转移目标"
+        },
+        "durationSeconds": "持续时长（秒）",
+        "terminal": {
+            "connecting": "连接中",
+            "connected": "已连接",
+            "disconnected": "已断开"
+        }
+    }
+}

@@ -30,6 +30,8 @@ import { useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { CopyValue, PageErrorNotice, mobileColumns } from "./lumen-page-parts"
+
 export default function WAFPage() {
     const { t } = useTranslation()
     const { profile } = useAuth()
@@ -82,6 +84,7 @@ export default function WAFPage() {
             header: "IP",
             accessorKey: "ip",
             accessorFn: (row) => row.ip,
+            cell: ({ row }) => <CopyValue value={row.original.ip} />,
         },
         {
             header: t("Count"),
@@ -113,7 +116,7 @@ export default function WAFPage() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("Actions"),
             cell: ({ row }) => {
                 const s = row.original
                 return (
@@ -144,7 +147,7 @@ export default function WAFPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "ip", ["lastBlockTime"]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
@@ -202,7 +205,7 @@ export default function WAFPage() {
         }
 
         return (
-            <div className="flex items-center justify-between gap-3 border-t px-4 py-2.5">
+            <div className="pg-pagination">
                 <div className="whitespace-nowrap text-xs text-muted-foreground tabular">
                     {t("Total")}: {total}
                 </div>
@@ -251,8 +254,9 @@ export default function WAFPage() {
     }
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader title={t("WAF")} description={t("Shell.Desc.WAF")} />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     {isAdmin && (

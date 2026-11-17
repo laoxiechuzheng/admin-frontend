@@ -1,14 +1,7 @@
 import { Oauth2RequestType, getOauth2RedirectURL } from "@/api/oauth2"
 import { BrandMark, LanguageMenu, ThemeMenu } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { OAuthProviderIcon } from "@/components/ui/icon"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -16,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth"
 import useSetting from "@/hooks/useSetting"
 import { zodResolver } from "@hookform/resolvers/zod"
 import i18next from "i18next"
+import { AlertCircle, LoaderCircle } from "lucide-react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -23,37 +17,25 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 const formSchema = z.object({
-    username: z.string().min(2, {
-        message: i18next.t("Results.UsernameMin", { number: 2 }),
-    }),
-    password: z.string().min(1, {
-        message: i18next.t("Results.PasswordRequired"),
-    }),
+    username: z.string().min(2, { message: i18next.t("Results.UsernameMin", { number: 2 }) }),
+    password: z.string().min(1, { message: i18next.t("Results.PasswordRequired") }),
 })
 
 function Login() {
     const { login, loginOauth2 } = useAuth()
     const { data: settingData } = useSetting()
-
     useEffect(() => {
         const oauth2 = new URLSearchParams(window.location.search).get("oauth2")
-        if (oauth2) {
-            loginOauth2()
-        }
+        if (oauth2) loginOauth2()
     }, [loginOauth2])
-
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            username: "",
-            password: "",
-        },
+        defaultValues: { username: "", password: "" },
     })
-
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        login(values.username, values.password)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        // 等待原 hook 的 Promise，仅用于本表单 pending；不把初始 profile 探测当成登录状态。
+        await login(values.username, values.password)
     }
-
     async function loginWith(provider: string) {
         try {
             const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.LOGIN)
@@ -62,95 +44,43 @@ function Login() {
             toast.error(error.message)
         }
     }
-
     const { t } = useTranslation()
-
     const siteName = settingData?.config?.site_name || t("nezha")
-
+    const formErrors = Object.values(form.formState.errors).map((error) => error.message).filter(Boolean)
     return (
-        <div className="relative flex flex-1 flex-col items-center justify-center px-4 py-16">
-            <div className="absolute right-3 top-3 flex items-center gap-0.5 sm:right-5 sm:top-4">
-                <LanguageMenu />
-                <ThemeMenu />
-            </div>
-            <div className="w-full max-w-[360px]">
-                <div className="mb-6 flex flex-col items-center text-center">
-                    <BrandMark large />
-                    <h1 className="mt-4 text-xl font-semibold text-foreground">{siteName}</h1>
-                    <p className="mt-1 text-[13px] text-muted-foreground">
-                        {t("Shell.SignInHint")}
-                    </p>
-                </div>
-                <div className="rounded-xl border bg-card p-5 sm:p-6">
+        <div className="sh-login">
+            <div className="sh-login-tools"><LanguageMenu /><ThemeMenu /></div>
+            <section className="sh-login-brand" aria-label={siteName}>
+                <BrandMark size={40} />
+                <h2>{siteName}</h2>
+                <p>{t("v2Shell.login.subtitle")}</p>
+                <div className="sh-login-copyright num">&copy; 2019-{new Date().getFullYear()} {t("nezha")} {settingData?.version}</div>
+            </section>
+            <div className="sh-login-main">
+                <div className="sh-login-card">
+                    <div className="sh-login-mobile-brand"><BrandMark size={48} /><h2>{siteName}</h2><p>{t("v2Shell.login.subtitle")}</p></div>
+                    <h1 className="sh-login-title">{t("v2Shell.login.title")}</h1>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t("Username")}</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="admin"
-                                                autoComplete="username"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t("Password")}</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="admin"
-                                                autoComplete="current-password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button type="submit" className="mt-2 w-full">
-                                {t("Login")}
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                            <FormField control={form.control} name="username" render={({ field }) => (
+                                <FormItem><FormLabel>{t("Username")}</FormLabel><FormControl><Input placeholder={t("Username")} autoComplete="username" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="password" render={({ field }) => (
+                                <FormItem><FormLabel>{t("Password")}</FormLabel><FormControl><Input type="password" placeholder={t("Password")} autoComplete="current-password" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            {formErrors.length > 0 && <div className="sh-login-error rounded-xl border border-danger/30 bg-danger/10 p-3 text-xs text-danger" role="alert"><AlertCircle className="mt-0.5 size-4 shrink-0" /><span>{formErrors.join(" · ")}</span></div>}
+                            <Button type="submit" className="h-11 w-full" disabled={form.formState.isSubmitting} aria-busy={form.formState.isSubmitting}>
+                                {form.formState.isSubmitting && <LoaderCircle aria-hidden="true" className="animate-spin" />}{t("Login")}
                             </Button>
                         </form>
-                        {settingData?.config?.oauth2_providers &&
-                            settingData?.config?.oauth2_providers.length > 0 && (
-                                <section className="flex items-center mt-5 mb-1 w-full">
-                                    <Separator className="flex-1" />
-                                    <div className="flex justify-center text-xs text-muted-foreground w-full max-w-[100px]">
-                                        OAuth2
-                                    </div>
-                                    <Separator className="flex-1" />
-                                </section>
-                            )}
                     </Form>
-                    <div className="mt-3 flex flex-col gap-2">
-                        {settingData?.config?.oauth2_providers?.map((p: string) => (
-                            <Button
-                                key={p}
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => loginWith(p)}
-                            >
-                                <OAuthProviderIcon provider={p} className="size-4" />
-                                {p}
-                            </Button>
-                        ))}
+                    {!!settingData?.config?.oauth2_providers?.length && <section className="mt-6 flex items-center gap-3"><Separator className="flex-1" /><span className="text-xs text-muted-foreground">OAuth2</span><Separator className="flex-1" /></section>}
+                    <div className="sh-login-oauth">
+                        {settingData?.config?.oauth2_providers?.map((provider: string) => <Button key={provider} variant="outline" onClick={() => loginWith(provider)}><OAuthProviderIcon provider={provider} className="size-4" />{provider}</Button>)}
                     </div>
                 </div>
             </div>
         </div>
     )
 }
-
 export default Login

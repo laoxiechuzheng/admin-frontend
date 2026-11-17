@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -32,6 +31,7 @@ import {
 import { IconButton } from "@/components/xui/icon-button"
 import { useNotification } from "@/hooks/useNotfication"
 import { conv } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelAlertRule } from "@/types"
 import { triggerModes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -42,6 +42,7 @@ import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 import { Combobox } from "./ui/combobox"
 import { Textarea } from "./ui/textarea"
 
@@ -185,17 +186,17 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="lg">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>
                                 {data ? t("EditAlertRule") : t("CreateAlertRule")}
                             </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.basic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -209,8 +210,10 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.rules")}>
                                 {/* 结构化规则编辑器 */}
-                                <FormItem>
+                                <FormItem className="fs-span-2">
                                     <FormLabel>{t("Rules")}</FormLabel>
                                     <div className="space-y-3">
                                         {rulesUI.map((r, idx) => {
@@ -219,12 +222,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                 r.type.endsWith("_cycle")
                                             const isOffline = r.type === "offline"
                                             return (
-                                                <div
-                                                    key={idx}
-                                                    className="rounded-md border p-3 space-y-2"
-                                                >
+                                                <div key={idx} className="fs-editor space-y-4">
                                                     {/* 类型选择 */}
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    <div className="fs-grid">
                                                         <div>
                                                             <Label className="text-sm">
                                                                 {t("Type")}
@@ -330,7 +330,9 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                         </div>
                                                         <div>
                                                             <Label className="text-sm">
-                                                                duration
+                                                                {isOffline
+                                                                    ? t("v2Forms.durationSeconds")
+                                                                    : "duration"}
                                                             </Label>
                                                             <Input
                                                                 type="number"
@@ -352,7 +354,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
 
                                                     {/* 阈值：offline 不需要 min/max */}
                                                     {!isOffline && (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                        <div className="fs-grid">
                                                             <div>
                                                                 <Label className="text-sm">
                                                                     min
@@ -403,7 +405,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     )}
 
                                                     {/* 覆盖/忽略 */}
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    <div className="fs-grid">
                                                         <div>
                                                             <Label className="text-sm">cover</Label>
                                                             <Select
@@ -448,7 +450,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                             </Label>
                                                             {/* 简化：以 JSON 对象输入 */}
                                                             <Textarea
-                                                                className="resize-y"
+                                                                className="fs-code resize-y"
                                                                 value={(() => {
                                                                     try {
                                                                         return r.ignore
@@ -486,8 +488,8 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
 
                                                     {/* 周期型字段 */}
                                                     {isCycle && (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                                            <div className="sm:col-span-2">
+                                                        <div className="fs-grid">
+                                                            <div className="fs-span-2">
                                                                 <Label className="text-sm">
                                                                     cycle_start (RFC3339)
                                                                 </Label>
@@ -613,7 +615,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     <FormLabel className="mt-3">{t("AdvancedJSON")}</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            className="resize-y"
+                                            className="fs-code resize-y"
                                             value={rulesRaw}
                                             onChange={(e) => {
                                                 // 同步到结构化编辑器
@@ -630,6 +632,8 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                         />
                                     </FormControl>
                                 </FormItem>
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.notify")}>
                                 <FormField
                                     control={form.control}
                                     name="notification_group_id"
@@ -679,7 +683,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     control={form.control}
                                     name="fail_trigger_tasks_raw"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>
                                                 {t("TasksToTriggerOnAlert") +
                                                     t("SeparateWithComma")}
@@ -695,7 +699,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     control={form.control}
                                     name="recover_trigger_tasks_raw"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>
                                                 {t("TasksToTriggerAfterRecovery") +
                                                     t("SeparateWithComma")}
@@ -711,7 +715,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     control={form.control}
                                     name="enable"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -725,18 +729,19 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

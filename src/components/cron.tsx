@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -33,6 +32,7 @@ import { IconButton } from "@/components/xui/icon-button"
 import { useNotification } from "@/hooks/useNotfication"
 import { useServer } from "@/hooks/useServer"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelCron } from "@/types"
 import { cronCoverageTypes, cronTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -43,6 +43,7 @@ import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 import { Combobox } from "./ui/combobox"
 import { Textarea } from "./ui/textarea"
 import { MultiSelect } from "./xui/multi-select"
@@ -134,15 +135,15 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="lg">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>{data ? t("EditTask") : t("CreateTask")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.basic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -183,11 +184,13 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.execution")}>
                                 <FormField
                                     control={form.control}
                                     name="scheduler"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("CronExpression")}</FormLabel>
                                             <FormControl>
                                                 <Input
@@ -203,7 +206,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="command"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("Command")}</FormLabel>
                                             <FormControl>
                                                 <Textarea className="resize-y" {...field} />
@@ -212,6 +215,8 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.coverage")}>
                                 <FormField
                                     control={form.control}
                                     name="cover"
@@ -245,7 +250,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="servers"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("SpecificServers")}</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
@@ -261,6 +266,8 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.notify")}>
                                 <FormField
                                     control={form.control}
                                     name="notification_group_id"
@@ -283,7 +290,7 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="push_successful"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -299,18 +306,19 @@ export const CronCard: React.FC<CronCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

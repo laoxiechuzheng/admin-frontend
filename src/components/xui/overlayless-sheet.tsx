@@ -20,7 +20,7 @@ const SheetClose = SheetPrimitive.Close
 const SheetPortal = SheetPrimitive.Portal
 
 const sheetVariants = cva(
-    "fixed z-50 gap-4 bg-card p-5 shadow-overlay transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=open]:duration-200",
+    "fixed z-50 gap-4 rounded-l-[20px] border-border bg-card p-5 shadow-overlay transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-160 data-[state=open]:duration-240",
     {
         variants: {
             side: {

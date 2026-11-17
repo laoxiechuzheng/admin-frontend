@@ -16,6 +16,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { PageErrorNotice, mobileColumns } from "./lumen-page-parts"
+
 export default function ServicePage() {
     const { t } = useTranslation()
     const { data, mutate, error, isLoading } = useSWR<Service[]>("/api/v1/service/list", swrFetcher)
@@ -129,7 +131,11 @@ export default function ServicePage() {
             header: t("Type"),
             accessorKey: "type",
             accessorFn: (row) => row.type,
-            cell: ({ row }) => serviceTypes[row.original.type] || "",
+            cell: ({ row }) => (
+                <span className="chip pg-type" data-tone="neutral">
+                    {serviceTypes[row.original.type] || ""}
+                </span>
+            ),
         },
         {
             header: t("Interval"),
@@ -186,18 +192,24 @@ export default function ServicePage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", [
+            "target",
+            t("SpecificServers"),
+            "failTriggerTasks",
+            "recoverTriggerTasks",
+        ]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Service")}
                 description={t("Shell.Desc.Service")}
                 actions={<ServiceCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

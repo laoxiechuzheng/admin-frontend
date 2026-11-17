@@ -1,3 +1,4 @@
+import SettingsPage from "@/routes/settings"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
@@ -35,6 +36,7 @@ const validConfig = {
         user_template: "user-dist",
         cover: 1,
         ip_change_notification_group_id: 0,
+        enable_mcp: true,
     },
     frontend_templates: [],
 }
@@ -63,7 +65,6 @@ afterEach(() => {
 
 test("SettingsPage does not toast Success when updateSettings rejects", async () => {
     updateSettings.mockRejectedValue(new Error("boom"))
-    const { default: SettingsPage } = await import("@/routes/settings")
 
     await act(async () => {
         render(
@@ -73,7 +74,8 @@ test("SettingsPage does not toast Success when updateSettings rejects", async ()
         )
     })
 
-    const submit = screen.getByRole("button", { name: /Confirm|Submit|Save/i })
+    const submit = screen.getByRole("button", { name: /Confirm|Submit|Save/i }) as HTMLButtonElement
+    expect(submit.disabled).toBe(false)
     await act(async () => {
         fireEvent.click(submit)
     })
@@ -87,7 +89,6 @@ test("SettingsPage does not toast Success when updateSettings rejects", async ()
 
 test("SettingsPage toasts Success when updateSettings resolves", async () => {
     updateSettings.mockResolvedValue(undefined)
-    const { default: SettingsPage } = await import("@/routes/settings")
 
     await act(async () => {
         render(
@@ -97,13 +98,15 @@ test("SettingsPage toasts Success when updateSettings resolves", async () => {
         )
     })
 
-    const submit = screen.getByRole("button", { name: /Confirm|Submit|Save/i })
+    const submit = screen.getByRole("button", { name: /Confirm|Submit|Save/i }) as HTMLButtonElement
+    expect(submit.disabled).toBe(false)
     await act(async () => {
         fireEvent.click(submit)
     })
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalled())
 
+    expect(updateSettings.mock.calls[0][0].enable_mcp).toBe(true)
     expect(toastCalls).toContain("Success")
     expect(toastCalls).not.toContain("Error")
 })

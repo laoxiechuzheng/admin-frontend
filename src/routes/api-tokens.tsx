@@ -39,6 +39,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { PageErrorNotice } from "./lumen-page-parts"
+
 export default function ApiTokensPage() {
     const { t } = useTranslation()
     const { profile } = useAuth()
@@ -73,7 +75,7 @@ export default function ApiTokensPage() {
     }
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("ApiTokens")}
                 description={t("Shell.Desc.ApiTokens")}
@@ -85,35 +87,49 @@ export default function ApiTokensPage() {
                 }
             />
 
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
-                <Table className="min-w-[860px]">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>{t("Name")}</TableHead>
-                            <TableHead>{t("Scopes")}</TableHead>
-                            <TableHead>{t("ApiTokenServers")}</TableHead>
-                            <TableHead>{t("ApiTokenExpiresAt")}</TableHead>
-                            <TableHead>{t("ApiTokenLastUsed")}</TableHead>
-                            <TableHead>{t("Actions")}</TableHead>
+                <Table
+                    role="table"
+                    data-responsive="cards"
+                    className="pg-native-table min-w-[860px]"
+                >
+                    <TableHeader role="rowgroup">
+                        <TableRow role="row">
+                            <TableHead role="columnheader" data-mobile="title">
+                                {t("Name")}
+                            </TableHead>
+                            <TableHead role="columnheader">{t("Scopes")}</TableHead>
+                            <TableHead role="columnheader">{t("ApiTokenServers")}</TableHead>
+                            <TableHead role="columnheader">{t("ApiTokenExpiresAt")}</TableHead>
+                            <TableHead role="columnheader">{t("ApiTokenLastUsed")}</TableHead>
+                            <TableHead role="columnheader" data-mobile="actions">
+                                {t("Actions")}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody role="rowgroup">
                         {isLoading ? (
-                            <TableRow className="hover:bg-transparent">
-                                <TableCell colSpan={6}>
+                            <TableRow role="row" className="hover:bg-transparent">
+                                <TableCell role="cell" colSpan={6}>
                                     <Skeleton className="h-4 w-full max-w-[60%]" />
                                 </TableCell>
                             </TableRow>
                         ) : !data || data.length === 0 ? (
-                            <TableRow className="hover:bg-transparent">
-                                <TableCell colSpan={6} className="p-0">
+                            <TableRow role="row" className="hover:bg-transparent">
+                                <TableCell role="cell" colSpan={6} className="p-0">
                                     <EmptyState icon={KeyRound} />
                                 </TableCell>
                             </TableRow>
                         ) : (
                             data.map((tok) => (
-                                <TableRow key={tok.id} className="whitespace-nowrap">
-                                    <TableCell className="font-medium">
+                                <TableRow role="row" key={tok.id} className="whitespace-nowrap">
+                                    <TableCell
+                                        role="cell"
+                                        data-mobile="title"
+                                        data-label={t("Name")}
+                                        className="font-medium"
+                                    >
                                         <div
                                             className="min-w-32 max-w-60 truncate"
                                             title={tok.name}
@@ -121,7 +137,12 @@ export default function ApiTokensPage() {
                                             {tok.name}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell
+                                        role="cell"
+                                        data-mobile="meta"
+                                        data-label={t("Scopes")}
+                                        data-span="full"
+                                    >
                                         <div className="flex flex-wrap gap-1">
                                             {(tok.scopes ?? []).map((s) => (
                                                 <Badge
@@ -134,22 +155,39 @@ export default function ApiTokensPage() {
                                             ))}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-mono text-xs tabular">
+                                    <TableCell
+                                        role="cell"
+                                        data-mobile="meta"
+                                        data-label={t("ApiTokenServers")}
+                                        data-span="full"
+                                        className="font-mono text-xs num"
+                                    >
                                         {tok.server_ids?.length
                                             ? tok.server_ids.join(", ")
                                             : t("ApiTokenAllServers")}
                                     </TableCell>
-                                    <TableCell className="text-xs tabular text-muted-foreground">
+                                    <TableCell
+                                        role="cell"
+                                        data-mobile="meta"
+                                        data-label={t("ApiTokenExpiresAt")}
+                                        className="text-xs num text-muted-foreground"
+                                    >
                                         {tok.expires_at
                                             ? new Date(tok.expires_at).toLocaleString()
                                             : t("ApiTokenNever")}
                                     </TableCell>
-                                    <TableCell className="text-xs tabular text-muted-foreground">
+                                    <TableCell
+                                        role="cell"
+                                        data-mobile="meta"
+                                        data-label={t("ApiTokenLastUsed")}
+                                        data-span="full"
+                                        className="text-xs num text-muted-foreground"
+                                    >
                                         {tok.last_used_at
                                             ? `${new Date(tok.last_used_at).toLocaleString()} (${tok.last_used_ip ?? "?"})`
                                             : t("ApiTokenNever")}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell role="cell" data-mobile="actions">
                                         <Button
                                             variant="destructive"
                                             size="sm"
@@ -330,22 +368,17 @@ function RevealedTokenDialog({
     const { t } = useTranslation()
     return (
         <Dialog open={!!token} onOpenChange={(v) => !v && onClose()}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="pg-token-reveal sm:max-w-[440px]">
                 <DialogHeader>
                     <DialogTitle>{t("ApiTokenCreated")}</DialogTitle>
                     <DialogDescription>{t("ApiTokenRevealOnce")}</DialogDescription>
                 </DialogHeader>
                 {token && (
                     <div className="space-y-3">
-                        <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-[13px]">
-                            {t("ApiTokenStoreSafely")}
-                        </div>
-                        <code className="block break-all rounded bg-muted p-3 font-mono text-xs">
-                            {token.token}
-                        </code>
+                        <div className="pg-token-warning">{t("ApiTokenStoreSafely")}</div>
+                        <code className="pg-token-value">{token.token}</code>
                         <Button
-                            variant="secondary"
-                            size="sm"
+                            className="pg-token-copy"
                             onClick={async () => {
                                 await navigator.clipboard.writeText(token.token)
                                 toast(t("Copied"))

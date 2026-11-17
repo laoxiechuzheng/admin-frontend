@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { PageErrorNotice, mobileColumns } from "./lumen-page-parts"
+
 export default function ServerGroupPage() {
     const { t } = useTranslation()
     const { data, mutate, error, isLoading } = useSWR<ModelServerGroupResponseItem[]>(
@@ -113,18 +115,19 @@ export default function ServerGroupPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", ["servers"]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Shell.ServerGroup")}
                 description={t("Shell.Desc.ServerGroup")}
                 actions={<ServerGroupCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

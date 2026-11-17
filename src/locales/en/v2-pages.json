@@ -1,0 +1,17 @@
+{
+    "v2Pages": {
+        "table": { "selectedPage": "{{count}} selected on this page" },
+        "settings": { "unsaved": "Unsaved changes", "sections": "Settings sections" },
+        "error": {
+            "title": "Unable to load records",
+            "description": "Any displayed data is preserved. Please try again.",
+            "retry": "Retry"
+        },
+        "actions": { "runTask": "Run task" },
+        "transfer": {
+            "connecting": "Connecting",
+            "connected": "Connected",
+            "reconnecting": "Reconnecting"
+        }
+    }
+}

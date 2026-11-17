@@ -1,0 +1,352 @@
+/* B2R 私有页面样式；颜色、表面和控件来自 Lumen 共用 token。 */
+.pg-workspace {
+    min-width: 0;
+}
+.pg-name {
+    display: block;
+    max-width: 15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+.pg-copy-value {
+    display: flex;
+    min-width: 0;
+    max-width: 20rem;
+    align-items: center;
+    gap: 8px;
+}
+.pg-copy-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 12px;
+    line-height: 20px;
+}
+.pg-copy-value > button {
+    flex-shrink: 0;
+}
+.pg-id {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    border-radius: 8px;
+    background: hsl(var(--muted));
+    padding: 2px 8px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.pg-number {
+    display: block;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.pg-type {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+.pg-cell-text {
+    display: inline-block;
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+.pg-workspace td[data-label="ID"] > .font-mono {
+    border-radius: 8px;
+    background: hsl(var(--muted));
+    padding: 2px 8px;
+}
+.pg-error {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid hsl(var(--danger) / 0.3);
+    border-radius: 16px;
+    background: hsl(var(--danger) / 0.1);
+    font-size: 13px;
+    line-height: 20px;
+}
+.pg-error-icon {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: hsl(var(--danger) / 0.1);
+    color: hsl(var(--danger));
+}
+.pg-error-icon svg {
+    width: 24px;
+    height: 24px;
+}
+.pg-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid hsl(var(--border));
+    padding: 12px 16px;
+}
+.pg-pagination > nav {
+    max-width: 100%;
+}
+.pg-pagination ul {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.pg-native-table td[data-mobile="title"],
+.pg-native-table th[data-mobile="title"] {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: inherit;
+}
+@media (min-width: 1024px) {
+    .pg-native-table td[data-mobile="actions"],
+    .pg-native-table th[data-mobile="actions"] {
+        position: sticky;
+        right: 0;
+        z-index: 1;
+        background: inherit;
+        box-shadow: inset 8px 0 8px -8px hsl(var(--foreground) / 0.3);
+    }
+}
+.pg-settings {
+    max-width: 1400px;
+}
+.pg-settings-form {
+    min-width: 0;
+}
+.pg-settings-layout {
+    display: grid;
+    min-width: 0;
+    gap: 16px;
+}
+.pg-settings-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-self: start;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    background: hsl(var(--foreground) / 0.05);
+}
+.pg-settings-nav a {
+    position: relative;
+    min-width: 0;
+    border-radius: 9px;
+    padding: 10px 12px;
+    color: hsl(var(--muted-foreground));
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    text-decoration: none;
+}
+.pg-settings-nav a:hover {
+    color: hsl(var(--foreground));
+    background: hsl(var(--foreground) / 0.05);
+}
+.pg-settings-nav a[aria-current] {
+    color: hsl(var(--foreground));
+    background: hsl(var(--primary) / 0.12);
+}
+.pg-settings-nav a[aria-current]::before {
+    position: absolute;
+    inset: 8px auto 8px 0;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--grad-accent);
+    content: "";
+}
+.pg-settings-panels {
+    display: grid;
+    min-width: 0;
+    width: 100%;
+    max-width: 720px;
+    gap: 16px;
+}
+.pg-settings-panels > div {
+    min-width: 0;
+    scroll-margin-top: 80px;
+}
+.pg-settings-panels label,
+.pg-settings-panels p {
+    overflow-wrap: anywhere;
+}
+.pg-settings-panels textarea {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 12px;
+}
+.pg-settings-save {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    box-shadow: var(--shadow-surface);
+}
+.pg-unsaved {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    color: hsl(var(--muted-foreground));
+    font-size: 12px;
+    line-height: 16px;
+}
+.pg-unsaved > span {
+    height: 6px;
+    width: 6px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: hsl(var(--primary));
+}
+.pg-saving {
+    animation: pg-spin 700ms linear infinite;
+}
+@keyframes pg-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.pg-real-ip-field {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+.pg-real-ip-input {
+    min-width: 0;
+    flex: 1 1 200px;
+}
+.pg-token-warning {
+    border: 1px solid hsl(var(--warning) / 0.3);
+    border-radius: 12px;
+    background: hsl(var(--warning) / 0.1);
+    padding: 12px;
+    color: hsl(var(--warning));
+    font-size: 13px;
+    line-height: 20px;
+}
+.pg-token-value {
+    display: block;
+    overflow-wrap: anywhere;
+    border-radius: 12px;
+    background: hsl(var(--muted));
+    padding: 12px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 12px;
+    line-height: 20px;
+}
+.pg-profile {
+    max-width: 1100px;
+}
+.pg-profile-identity {
+    align-self: start;
+}
+.pg-profile-ip {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+@media (min-width: 1024px) {
+    .pg-settings-layout {
+        grid-template-columns: 200px minmax(0, 720px);
+        gap: 24px;
+    }
+    .pg-settings-nav {
+        position: sticky;
+        top: 80px;
+        flex-direction: column;
+    }
+}
+@media (max-width: 767px) {
+    .pg-error {
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+    .pg-settings-panels,
+    .pg-settings-layout {
+        gap: 12px;
+    }
+    .pg-settings-save {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .pg-settings-save > button {
+        width: 100%;
+        min-height: 44px;
+    }
+    .pg-unsaved {
+        width: 100%;
+    }
+    .pg-pagination {
+        justify-content: center;
+    }
+    .pg-pagination > div {
+        width: 100%;
+        text-align: center;
+    }
+    .pg-token-copy {
+        min-height: 44px;
+        width: 100%;
+    }
+}
+@media (max-width: 639px) {
+    /* 仅补本块内容，不覆盖共享表格的卡片栅格与选择命中区。 */
+    .pg-workspace table[data-responsive="cards"] .pg-copy-value {
+        max-width: 100%;
+    }
+    .pg-workspace table[data-responsive="cards"] .pg-copy-text {
+        overflow: visible;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .pg-workspace table[data-responsive="cards"] .pg-number {
+        text-align: left;
+    }
+    .pg-workspace table[data-responsive="cards"] .pg-cell-text {
+        overflow: visible;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .pg-workspace table[data-responsive="cards"] [data-mobile="title"] > div {
+        min-width: 0;
+    }
+    .pg-workspace table[data-responsive="cards"] td[data-mobile="actions"] {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .pg-workspace .pg-native-table td[data-mobile="title"] {
+        position: static;
+    }
+    .pg-workspace .pg-native-table td[data-mobile="meta"] {
+        max-width: none;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pg-saving {
+        animation: none;
+    }
+}

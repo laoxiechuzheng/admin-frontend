@@ -46,7 +46,7 @@ export default function Root() {
     )
 
     // The login screen (and anything rendered before a profile exists) gets a
-    // bare canvas; every authenticated page lives inside the Signal app shell.
+    // bare canvas; every authenticated page lives inside the Lumen app shell.
     const bare = pathname === "/dashboard/login" || !profile
 
     return (
@@ -56,7 +56,7 @@ export default function Root() {
                     <main className="flex flex-1 flex-col">
                         <Outlet />
                     </main>
-                    {footer}
+                    {pathname !== "/dashboard/login" && footer}
                 </div>
             ) : (
                 <AppShell footer={footer}>

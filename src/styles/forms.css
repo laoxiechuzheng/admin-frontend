@@ -1,0 +1,264 @@
+.fs-sheet-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+.fs-sheet-head {
+    flex: none;
+    min-width: 0;
+    padding: 20px 24px;
+    padding-right: 56px;
+    border-bottom: 1px solid hsl(var(--border));
+    text-align: left;
+}
+
+.fs-sheet-body {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 20px 24px;
+    scrollbar-gutter: stable;
+}
+
+.fs-sheet-foot {
+    display: flex;
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 24px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid hsl(var(--border));
+    background: hsl(var(--card));
+}
+
+.fs-sheet-foot > button {
+    flex: none;
+    margin: 0;
+}
+
+.fs-dirty {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+    font-size: 12px;
+    line-height: 16px;
+    color: hsl(var(--muted-foreground));
+}
+
+.fs-dirty > span {
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+}
+
+.fs-section {
+    min-width: 0;
+}
+
+.fs-section + .fs-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid hsl(var(--foreground) / 0.06);
+}
+
+.fs-grid {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.fs-grid > *,
+.fs-span-2 {
+    min-width: 0;
+}
+
+.fs-span-2 {
+    grid-column: 1 / -1;
+}
+
+.fs-sheet-body label {
+    font-size: 12.5px;
+    line-height: 20px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.fs-sheet-body textarea {
+    min-height: 96px;
+}
+
+.fs-sheet-body input,
+.fs-sheet-body textarea,
+.fs-sheet-body [role="combobox"] {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.fs-check {
+    min-height: 40px;
+    align-self: end;
+    gap: 8px;
+}
+
+.fs-check > div {
+    min-width: 0;
+}
+
+.fs-check label {
+    white-space: normal;
+}
+
+.fs-editor {
+    padding: 16px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    background: hsl(var(--foreground) / 0.02);
+}
+
+.fs-editor .fs-grid {
+    margin-top: 0;
+}
+
+.fs-code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.fs-note-modes,
+.fs-note-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.fs-loading {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.fs-install-menu {
+    border-radius: 12px;
+}
+
+.fs-terminal-frame {
+    padding: 0;
+    margin-top: 16px;
+}
+
+.fs-terminal-head {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 12px;
+    border-bottom: 1px solid hsl(var(--border));
+}
+
+.fs-terminal-status {
+    flex: none;
+    white-space: nowrap;
+}
+
+.fs-terminal-frame .terminal-shell {
+    margin: 0;
+    padding: 12px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--terminal-bg, #05070d);
+    box-shadow: none;
+}
+
+.fs-terminal-frame .terminal-screen {
+    border-radius: 14px;
+    background: var(--terminal-bg, #05070d);
+}
+
+.fs-terminal-empty {
+    margin: 12px;
+    padding: 24px;
+    border-radius: 14px;
+    font-size: 13px;
+    color: hsl(var(--muted-foreground));
+    text-align: center;
+}
+
+.fs-fm-sheet {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background: hsl(var(--card));
+}
+
+.fs-fm-drawer {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background: hsl(var(--card));
+}
+
+.fs-fm-head {
+    min-height: 44px;
+    border-bottom: 1px solid hsl(var(--border));
+}
+
+.fs-fm-body {
+    border-radius: 16px;
+    background: hsl(var(--card));
+}
+
+@media (min-width: 768px) {
+    [data-size="md"] .fs-grid,
+    [data-size="lg"] .fs-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .fs-sheet-head,
+    .fs-sheet-body {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .fs-sheet-head {
+        padding-right: 56px;
+    }
+
+    .fs-sheet-foot {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .fs-sheet-foot > button {
+        flex: 1 1 0;
+        min-height: 44px;
+    }
+
+    .fs-dirty {
+        flex-basis: 100%;
+        margin: 0 0 4px;
+    }
+
+    .fs-terminal-head {
+        padding: 8px 12px;
+    }
+}

@@ -6,6 +6,7 @@ const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
         <div className="relative w-full overflow-auto">
             <table
                 ref={ref}
+                role="table"
                 className={cn("w-full caption-bottom text-[13px]", className)}
                 {...props}
             />
@@ -18,6 +19,7 @@ const TableHeader = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTable
     ({ className, ...props }, ref) => (
         <thead
             ref={ref}
+            role="rowgroup"
             className={cn("bg-muted/40 [&_tr]:border-b [&_tr]:hover:bg-transparent", className)}
             {...props}
         />
@@ -27,7 +29,7 @@ TableHeader.displayName = "TableHeader"
 
 const TableBody = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
     ({ className, ...props }, ref) => (
-        <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
+        <tbody ref={ref} role="rowgroup" className={cn("[&_tr:last-child]:border-0", className)} {...props} />
     ),
 )
 TableBody.displayName = "TableBody"
@@ -36,6 +38,7 @@ const TableFooter = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTable
     ({ className, ...props }, ref) => (
         <tfoot
             ref={ref}
+            role="rowgroup"
             className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
             {...props}
         />
@@ -47,6 +50,7 @@ const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElem
     ({ className, ...props }, ref) => (
         <tr
             ref={ref}
+            role="row"
             className={cn(
                 "border-b transition-colors duration-150 hover:bg-muted/60 data-[state=selected]:bg-primary/[0.06]",
                 className,
@@ -61,8 +65,9 @@ const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCel
     ({ className, ...props }, ref) => (
         <th
             ref={ref}
+            role="columnheader"
             className={cn(
-                "h-10 whitespace-nowrap px-3 text-left align-middle text-xs font-medium text-muted-foreground first:pl-4 last:pr-4 [&:has([role=checkbox])]:w-10 [&:has([role=checkbox])]:pr-0",
+                "h-10 whitespace-nowrap px-3 text-left align-middle text-xs font-medium text-muted-foreground first:pl-4 last:pr-4",
                 className,
             )}
             {...props}
@@ -75,8 +80,9 @@ const TableCell = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCel
     ({ className, ...props }, ref) => (
         <td
             ref={ref}
+            role="cell"
             className={cn(
-                "h-11 px-3 py-2 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0",
+                "h-11 px-3 py-2 align-middle first:pl-4 last:pr-4",
                 className,
             )}
             {...props}

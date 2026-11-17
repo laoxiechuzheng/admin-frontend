@@ -2,7 +2,6 @@ import { swrFetcher } from "@/api/api"
 import { deleteServer, forceUpdateServer } from "@/api/server"
 import { ActionButtonGroup } from "@/components/action-button-group"
 import { BatchMoveServerIcon } from "@/components/batch-move-server-icon"
-import { CopyButton } from "@/components/copy-button"
 import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { InstallCommandsMenu } from "@/components/install-commands"
@@ -24,6 +23,7 @@ import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
 import { selectableTableFeatures } from "@/lib/table"
 import { joinIP } from "@/lib/utils"
+import "@/styles/pages.css"
 import { ModelServerTaskResponse, ModelServer as Server } from "@/types"
 import { ColumnDef, useTable } from "@tanstack/react-table"
 import { Server as ServerIcon } from "lucide-react"
@@ -31,6 +31,8 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
+
+import { CopyValue, PageErrorNotice, mobileColumns } from "./lumen-page-parts"
 
 export default function ServerPage() {
     const { t } = useTranslation()
@@ -83,6 +85,7 @@ export default function ServerPage() {
         },
         {
             header: t("Name"),
+            meta: { mobile: "title", label: t("Name") },
             accessorKey: "name",
             accessorFn: (row) => row.name,
             cell: ({ row }) => {
@@ -99,6 +102,7 @@ export default function ServerPage() {
         },
         {
             header: t("Group"),
+            meta: { mobile: "meta", label: t("Group"), span: "full" },
             accessorKey: "groups",
             accessorFn: (row) => {
                 return (
@@ -125,6 +129,7 @@ export default function ServerPage() {
         {
             id: "owner",
             header: t("Owner"),
+            meta: { mobile: "meta", label: t("Owner"), span: "full" },
             // Backend Server.MarshalJSON always emits owner.id; username is
             // omitted for uid=0 (legacy global agent secret) and for users
             // that no longer exist. Render uid=0 as "Global Agent" and a
@@ -154,16 +159,10 @@ export default function ServerPage() {
         {
             id: "ip",
             header: "IP",
+            meta: { mobile: "meta", label: "IP", span: "full" },
             cell: ({ row }) => {
                 const s = row.original
-                return (
-                    <div
-                        className="max-w-40 truncate font-mono text-xs tabular"
-                        title={String(joinIP(s.geoip?.ip) ?? "")}
-                    >
-                        {joinIP(s.geoip?.ip)}
-                    </div>
-                )
+                return <CopyValue value={joinIP(s.geoip?.ip)} />
             },
         },
         {
@@ -192,6 +191,7 @@ export default function ServerPage() {
         {
             id: "note",
             header: t("Note"),
+            meta: { mobile: "meta", label: t("Note"), span: "full" },
             cell: ({ row }) => {
                 const s = row.original
                 return <NoteMenu note={{ private: s.note, public: s.public_note }} />
@@ -200,9 +200,10 @@ export default function ServerPage() {
         {
             id: "uuid",
             header: "UUID",
+            meta: { mobile: "meta", label: "UUID", span: "full" },
             cell: ({ row }) => {
                 const s = row.original
-                return <CopyButton text={s.uuid} />
+                return <CopyValue value={s.uuid} />
             },
         },
         {
@@ -251,18 +252,19 @@ export default function ServerPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name"),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Server")}
                 description={t("Shell.Desc.Server")}
                 actions={<InstallCommandsMenu />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup
@@ -275,6 +277,7 @@ export default function ServerPage() {
                     >
                         <IconButton
                             icon="update"
+                            disabled={selectedRows.length === 0}
                             title={t("Shell.ForceUpdate")}
                             aria-label={t("Shell.ForceUpdate")}
                             onClick={async () => {
@@ -312,11 +315,13 @@ export default function ServerPage() {
                             }}
                         />
                         <BatchMoveServerIcon
+                            disabled={selectedRows.length === 0}
                             serverIds={selectedRows.map((r) => r.original.id)}
                             title={t("BatchMoveServer")}
                             aria-label={t("BatchMoveServer")}
                         />
                         <ServerConfigCardBatch
+                            disabled={selectedRows.length === 0}
                             sid={selectedRows.map((r) => r.original.id)}
                             title={t("EditServerConfig")}
                             aria-label={t("EditServerConfig")}

@@ -1,5 +1,6 @@
 import { useTheme } from "@/components/theme-provider"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import "@/styles/shell.css"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -69,10 +70,12 @@ const COLLAPSE_KEY = "nz-sidebar-collapsed"
 
 function readCollapsed() {
     try {
-        return localStorage.getItem(COLLAPSE_KEY) === "1"
+        const stored = localStorage.getItem(COLLAPSE_KEY)
+        if (stored !== null) return stored === "1"
     } catch {
-        return false
+        // 存储不可用时仍按当前视口给出可逆默认值。
     }
+    return window.innerWidth < 1180
 }
 
 function writeCollapsed(value: boolean) {
@@ -185,23 +188,13 @@ export function useCurrentPage() {
     return undefined
 }
 
-// Same mark and chip as the public site's header (user-frontend Header.tsx),
-// so both consoles read as one product.
-export function BrandMark({ large }: { large?: boolean }) {
+// 与前台共用 Lumen 标记；large 保留给既有登录调用方。
+export function BrandMark({ large, size, className }: { large?: boolean; size?: number; className?: string }) {
     return (
-        <span
-            className={cn(
-                "flex shrink-0 items-center justify-center overflow-hidden rounded-md border bg-card",
-                large ? "size-10" : "size-7",
-            )}
-        >
-            <img
-                src="/dashboard/brand-mark.png"
-                alt=""
-                width={40}
-                height={40}
-                className={cn("object-cover object-top", large ? "size-7" : "size-5")}
-            />
+        <span aria-hidden="true" className={cn("sh-brand-mark", className)} style={{ width: size ?? (large ? 40 : 28), height: size ?? (large ? 40 : 28) }}>
+            <svg viewBox="0 0 32 32" fill="none" focusable="false">
+                <path d="M10 22V10l12 12V10" stroke="hsl(var(--primary-foreground))" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
         </span>
     )
 }
@@ -213,13 +206,13 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
     return (
         <Link
             to="/dashboard"
-            className="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-4"
+            className={cn("sh-brand", collapsed && "sh-brand-collapsed")}
             title={name}
         >
             <BrandMark />
             {!collapsed && (
                 <span className="min-w-0 leading-tight">
-                    <span className="block truncate text-[13px] font-semibold text-foreground">
+                    <span className="block truncate text-[15px] font-semibold text-foreground">
                         {name}
                     </span>
                     <span className="block text-[11px] text-muted-foreground">
@@ -235,13 +228,13 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
     const groups = useNavGroups()
     const { pathname } = useLocation()
     return (
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-4">
+        <nav className={cn("sh-nav", collapsed && "sh-nav-collapsed")}>
             {groups.map((group) => (
-                <div key={group.label} className="pt-3 first:pt-2">
+                <div key={group.label} className="pt-4 first:pt-3">
                     {collapsed ? (
                         <div className="mx-2 mb-2 h-px bg-border" aria-hidden />
                     ) : (
-                        <div className="px-2.5 pb-1.5 text-[11px] font-medium text-muted-foreground/80">
+                        <div className="px-2.5 pb-1.5 text-[11px] font-semibold text-muted-foreground">
                             {group.label}
                         </div>
                     )}
@@ -257,22 +250,20 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
                                         title={collapsed ? item.label : undefined}
                                         aria-current={active ? "page" : undefined}
                                         className={cn(
-                                            "group relative flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors duration-150",
-                                            collapsed && "justify-center px-0",
-                                            active
-                                                ? "bg-primary/10 text-foreground"
-                                                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                                            "sh-nav-link group",
+                                            collapsed && "sh-nav-link-collapsed",
+                                            active && "sh-nav-link-active",
                                         )}
                                     >
                                         {active && (
                                             <span
                                                 aria-hidden
-                                                className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-primary"
+                                                className="sh-nav-active-bar"
                                             />
                                         )}
                                         <Icon
                                             className={cn(
-                                                "h-4 w-4 shrink-0",
+                                                "size-[18px] shrink-0",
                                                 active
                                                     ? "text-primary"
                                                     : "text-muted-foreground group-hover:text-foreground",
@@ -295,31 +286,25 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
 function SidebarFooter({ collapsed, onToggle }: { collapsed?: boolean; onToggle?: () => void }) {
     const { t } = useTranslation()
     const { data: settingData } = useSetting()
+    const { profile } = useAuth()
     const label = collapsed ? t("Shell.Expand") : t("Shell.Collapse")
     return (
-        <div
-            className={cn(
-                "flex h-11 shrink-0 items-center justify-between gap-2 border-t px-4",
-                collapsed && "justify-center px-0",
-            )}
-        >
-            {!collapsed && (
-                <span className="truncate font-mono text-[11px] text-muted-foreground/80 tabular">
-                    v{settingData?.version ?? ""}
-                </span>
-            )}
-            {onToggle && (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={onToggle}
-                    aria-label={label}
-                    title={label}
-                >
+        <div className={cn("sh-sidebar-footer", collapsed && "sh-sidebar-footer-collapsed")}>
+            <Link to="/dashboard/profile" title={profile?.username} className="sh-sidebar-user">
+                <Avatar className="size-8 border border-primary/25">
+                    <AvatarFallback className="bg-primary/12 text-xs text-primary">{profile?.username?.slice(0, 1).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                {!collapsed && <span className="min-w-0">
+                    <span className="block truncate text-[13px] font-medium">{profile?.username}</span>
+                    <span className="block text-[11px] text-muted-foreground">{t(profile?.role === 0 ? "v2Shell.navigation.administrator" : "v2Shell.navigation.member")}</span>
+                </span>}
+            </Link>
+            <div className="flex items-center justify-between gap-2">
+                {!collapsed && <span className="truncate font-mono text-[11px] text-muted-foreground num">v{settingData?.version ?? ""}</span>}
+                {onToggle && <Button variant="ghost" size="icon" onClick={onToggle} aria-label={label} title={label}>
                     {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
-                </Button>
-            )}
+                </Button>}
+            </div>
         </div>
     )
 }
@@ -328,8 +313,8 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
     return (
         <aside
             className={cn(
-                "sticky top-0 hidden h-dvh shrink-0 flex-col border-r bg-card transition-[width] duration-150 ease-out lg:flex",
-                collapsed ? "w-16" : "w-60",
+                "sh-sidebar",
+                collapsed && "sh-sidebar-collapsed",
             )}
         >
             <div className="flex items-center justify-between border-b">
@@ -351,14 +336,14 @@ function MobileNav() {
                     variant="ghost"
                     size="icon"
                     className="-ml-1.5 lg:hidden"
-                    aria-label="Toggle Menu"
+                    aria-label={t("v2Shell.navigation.toggle")}
                 >
                     <Menu />
                 </Button>
             </DialogPrimitive.Trigger>
             <DialogPrimitive.Portal>
-                <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/55 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-                <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r bg-card shadow-overlay duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left">
+                <DialogPrimitive.Overlay className="sh-overlay fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+                <DialogPrimitive.Content className="sh-mobile-nav">
                     <DialogPrimitive.Title className="sr-only">
                         {t("NavigateTo")}
                     </DialogPrimitive.Title>
@@ -374,6 +359,7 @@ function MobileNav() {
                         </DialogPrimitive.Close>
                     </div>
                     <NavList onNavigate={() => setOpen(false)} />
+                    <div className="flex items-center justify-end gap-2 px-5 pb-3"><LanguageMenu /><ThemeMenu /></div>
                     <SidebarFooter />
                 </DialogPrimitive.Content>
             </DialogPrimitive.Portal>
@@ -476,7 +462,7 @@ function Clock() {
         setTimeString(DateTime.now().setLocale("en-US").toLocaleString(timeOption))
     }, 1000)
     return (
-        <span className="hidden items-center gap-1.5 text-xs text-muted-foreground xl:flex">
+        <span className="hidden items-center gap-1.5 font-mono text-xs text-muted-foreground lg:flex">
             {t("CurrentTime")}
             <span className="tabular text-foreground">{timeString}</span>
         </span>
@@ -499,13 +485,6 @@ function UserMenu() {
                     aria-label={profile.username}
                 >
                     <Avatar className="h-7 w-7 border">
-                        <AvatarImage
-                            src={
-                                "https://api.dicebear.com/7.x/notionists/svg?seed=" +
-                                profile.username
-                            }
-                            alt={profile.username}
-                        />
                         <AvatarFallback className="text-xs">
                             {profile.username.slice(0, 1).toUpperCase()}
                         </AvatarFallback>
@@ -557,15 +536,15 @@ function Topbar() {
     const { t } = useTranslation()
     const current = useCurrentPage()
     return (
-        <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-3 sm:px-5 lg:px-6">
+        <header className="sh-topbar glass">
             <MobileNav />
             <div className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]">
                 {current ? (
                     <>
-                        <span className="hidden truncate text-muted-foreground sm:inline">
+                        <span className="hidden truncate text-muted-foreground md:inline">
                             {current.group}
                         </span>
-                        <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+                        <span className="hidden text-muted-foreground/50 md:inline" aria-hidden>
                             /
                         </span>
                         <span className="truncate font-medium text-foreground">
@@ -603,7 +582,7 @@ export function AppShell({ children, footer }: { children: ReactNode; footer?: R
         })
     }
     return (
-        <div className="flex min-h-dvh w-full">
+        <div className="sh-app-shell flex min-h-dvh w-full">
             <Sidebar collapsed={collapsed} onToggle={toggle} />
             <div className="flex min-w-0 flex-1 flex-col">
                 <Topbar />

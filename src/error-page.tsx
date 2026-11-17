@@ -1,42 +1,23 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { AlertCircle } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { useNavigate, useRouteError } from "react-router-dom"
 
-interface RouterError {
-    statusText?: string
-    message?: string
-    status?: number
-}
-
+interface RouterError { statusText?: string; message?: string; status?: number }
 export default function ErrorPage() {
     const error = useRouteError() as RouterError
     const navigate = useNavigate()
+    const { t } = useTranslation()
     console.error(error)
-
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
-            <Card className="w-full max-w-md rounded-xl">
-                <CardContent className="pt-6 text-center space-y-4">
-                    <div className="flex justify-center">
-                        <AlertCircle className="h-12 w-12 text-destructive" />
-                    </div>
-                    <h1 className="text-2xl font-semibold">Oops!</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Sorry, an unexpected error has occurred.
-                    </p>
-                    <div className="rounded-md border bg-muted/60 p-3">
-                        <p className="font-mono text-xs text-destructive">
-                            {error.statusText || error.message}
-                        </p>
-                    </div>
-                </CardContent>
-                <CardFooter className="flex justify-center pb-6">
-                    <Button variant="default" size="lg" onClick={() => navigate("/dashboard")}>
-                        Back to Dashboard
-                    </Button>
-                </CardFooter>
-            </Card>
+        <div className="flex min-h-screen w-full items-center justify-center p-4">
+            <section className="surface w-full max-w-md border-danger/30 bg-danger/10 p-6 text-center">
+                <span className="mx-auto mb-4 flex size-11 items-center justify-center rounded-[14px] bg-danger/12 text-danger"><AlertCircle className="size-6" /></span>
+                <h1 className="text-xl font-semibold">{t("v2Shell.error.title")}</h1>
+                <p className="mt-2 text-[13px] text-muted-foreground">{t("v2Shell.error.description")}</p>
+                <p className="my-5 break-words rounded-xl border border-danger/30 bg-card p-3 font-mono text-xs text-danger">{error.statusText || error.message}</p>
+                <Button variant="outline" onClick={() => navigate("/dashboard")}>{t("v2Shell.error.back")}</Button>
+            </section>
         </div>
     )
 }

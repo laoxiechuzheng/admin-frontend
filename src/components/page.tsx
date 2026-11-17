@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Inbox, LucideIcon } from "lucide-react"
-import { HTMLAttributes, ReactNode } from "react"
+import { HTMLAttributes, ReactNode, createContext, useContext } from "react"
 import { useTranslation } from "react-i18next"
 
 /** Page wrapper: consistent gutters and max width inside the app shell. */
@@ -8,13 +8,17 @@ export function Page({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
     return (
         <div
             className={cn(
-                "mx-auto w-full max-w-[1400px] px-4 pb-10 pt-6 sm:px-6 lg:px-8",
+                "mx-auto w-full max-w-[1400px] px-4 pb-10 pt-6 md:px-6 lg:px-8",
                 className,
             )}
             {...props}
         />
     )
 }
+
+// 仅用 Context 标识页头动作区，不复制/遍历 Radix Trigger 的后代。
+export const PageHeaderActionsContext = createContext(false)
+export const usePageHeaderActions = () => useContext(PageHeaderActionsContext)
 
 /** PageHeader: title + optional one-line description + right-aligned actions. */
 export function PageHeader({
@@ -31,21 +35,21 @@ export function PageHeader({
     return (
         <div
             className={cn(
-                "mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between",
+                "sh-page-header flex flex-col gap-3 md:flex-row md:items-end md:justify-between",
                 className,
             )}
         >
             <div className="min-w-0">
-                <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-2xl">
+                <h1 className="text-xl font-semibold leading-[26px] tracking-[-.02em] text-foreground md:text-2xl md:leading-[30px]">
                     {title}
                 </h1>
                 {description && (
-                    <p className="mt-1 max-w-2xl text-[13px] text-muted-foreground">
+                    <p className="mt-1 max-w-2xl line-clamp-2 text-[13px] text-muted-foreground">
                         {description}
                     </p>
                 )}
             </div>
-            {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+            {actions && <div className="sh-page-header-actions flex shrink-0 flex-wrap items-center gap-2"><PageHeaderActionsContext.Provider value={true}>{actions}</PageHeaderActionsContext.Provider></div>}
         </div>
     )
 }
@@ -64,30 +68,33 @@ export function Toolbar({
     return (
         <div
             className={cn(
-                "flex min-h-12 flex-wrap items-center justify-between gap-2 border-b px-3 py-2 sm:px-4",
+                "sh-toolbar flex min-h-14 items-center justify-between gap-2 border-b px-5 py-2",
+                !!selected && "bg-primary/[.08]",
                 className,
             )}
+            data-selected={!!selected}
         >
             {selected !== undefined && (
                 <span
+                    key={selected}
                     className={cn(
-                        "text-[13px] tabular",
-                        selected > 0 ? "font-medium text-foreground" : "text-muted-foreground",
+                        "sh-selection text-[13px] num",
+                        selected > 0 ? "font-medium text-primary" : "text-muted-foreground",
                     )}
                 >
                     {selected > 0
-                        ? t("Shell.SelectedCount", { count: selected })
+                        ? t("v2Shell.table.selectedPage", { count: selected })
                         : t("Shell.NoneSelected")}
                 </span>
             )}
-            <div className="ml-auto flex flex-wrap items-center gap-2">{children}</div>
+            <div className="sh-toolbar-controls">{children}</div>
         </div>
     )
 }
 
 /** Bordered surface that hosts toolbars and tables. */
 export function Panel({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-    return <div className={cn("overflow-hidden rounded-lg border bg-card", className)} {...props} />
+    return <div className={cn("surface overflow-hidden", className)} {...props} />
 }
 
 export function EmptyState({
@@ -111,11 +118,11 @@ export function EmptyState({
                 className,
             )}
         >
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg border bg-muted text-muted-foreground">
-                <Icon className="h-5 w-5" />
+            <span className="sh-empty-icon">
+                <Icon className="size-6" />
             </span>
-            <p className="text-[13px] font-medium text-foreground">{title ?? t("NoResults")}</p>
-            {description && <p className="max-w-sm text-xs text-muted-foreground">{description}</p>}
+            <p className="text-sm font-semibold text-foreground">{title ?? t("NoResults")}</p>
+            {description && <p className="max-w-sm text-[13px] text-muted-foreground">{description}</p>}
             {action && <div className="mt-2">{action}</div>}
         </div>
     )
@@ -135,18 +142,9 @@ export function BoolCell({
     const on = !!value
     return (
         <span
-            className={cn(
-                "inline-flex items-center gap-1.5 whitespace-nowrap",
-                on ? "text-foreground" : "text-muted-foreground",
-            )}
+            className="chip whitespace-nowrap"
+            data-tone={on ? "success" : "neutral"}
         >
-            <span
-                aria-hidden
-                className={cn(
-                    "h-1.5 w-1.5 rounded-full",
-                    on ? "bg-success" : "bg-neutral-status/70",
-                )}
-            />
             {on ? (onLabel ?? t("Shell.Yes")) : (offLabel ?? t("Shell.No"))}
         </span>
     )
@@ -154,7 +152,7 @@ export function BoolCell({
 
 /** Monospace cell for IDs, IPs, versions and commands. */
 export function MonoCell({ children, className }: { children: ReactNode; className?: string }) {
-    return <span className={cn("font-mono text-xs tabular", className)}>{children}</span>
+    return <span className={cn("font-mono text-xs num", className)}>{children}</span>
 }
 
 /** Settings-style form section: titled card with a quiet header row. */
@@ -170,7 +168,7 @@ export function FormSection({
     className?: string
 }) {
     return (
-        <section className={cn("rounded-lg border bg-card", className)}>
+        <section className={cn("sh-form-section surface", className)}>
             <div className="border-b px-5 py-3.5">
                 <h2 className="text-sm font-semibold text-foreground">{title}</h2>
                 {description && (
@@ -186,7 +184,7 @@ export function FormSection({
 export function FieldGroupTitle({ children }: { children: ReactNode }) {
     return (
         <div className="flex items-center gap-3 pt-3 first:pt-0">
-            <span className="text-xs font-medium text-muted-foreground">{children}</span>
+            <span className="text-[13px] font-semibold text-foreground">{children}</span>
             <span aria-hidden className="h-px flex-1 bg-border" />
         </div>
     )

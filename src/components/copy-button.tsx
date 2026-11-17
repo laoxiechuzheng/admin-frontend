@@ -36,8 +36,10 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>((props,
         <IconButton
             {...props}
             ref={ref}
-            variant="outline"
+            variant="ghost"
             size="icon"
+            className={`sh-copy size-6 [&_svg]:size-4 ${props.className ?? ""}`}
+            aria-label={props["aria-label"] ?? t("Copy")}
             icon={copy ? "check" : "clipboard"}
             onClick={() => switchState(props.text)}
         />

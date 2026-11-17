@@ -203,9 +203,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                     <Button
                         ref={ref}
                         {...props}
+                        variant="outline"
                         onClick={handleTogglePopover}
                         className={cn(
-                            "flex w-full p-1 rounded-md border border-input min-h-9 h-auto items-center justify-between bg-card text-foreground font-normal hover:bg-card hover:border-muted-foreground/40 dark:bg-background dark:hover:bg-background [&_svg]:pointer-events-auto",
+                            "flex w-full p-1 rounded-[10px] border border-input min-h-10 h-auto items-center justify-between bg-card text-foreground font-normal hover:bg-muted [&_svg]:pointer-events-auto",
                             className,
                         )}
                     >

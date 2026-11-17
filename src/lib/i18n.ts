@@ -74,6 +74,15 @@ i18n.use(initReactI18next).init({
     },
 })
 
+const v2Translations = import.meta.glob("../locales/*/v2-*.json", {
+    eager: true,
+    import: "default",
+})
+for (const [path, json] of Object.entries(v2Translations)) {
+    const language = path.split("/").slice(-2)[0]
+    i18n.addResourceBundle(language === "en" ? "en-US" : language, "translation", json as object, true, false)
+}
+
 i18n.on("languageChanged", (lng) => {
     localStorage.setItem("language", lng)
 })

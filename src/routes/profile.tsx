@@ -1,8 +1,8 @@
 import { Oauth2RequestType, getOauth2RedirectURL, unbindOauth2 } from "@/api/oauth2"
 import { getProfile } from "@/api/user"
-import { EmptyState, Page, PageHeader } from "@/components/page"
+import { EmptyState, Page, PageHeader, Panel } from "@/components/page"
 import { ProfileCard } from "@/components/profile"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { OAuthProviderIcon } from "@/components/ui/icon"
@@ -53,23 +53,19 @@ export default function ProfilePage() {
 
     return (
         profile && (
-            <Page className="max-w-[1100px]">
+            <Page className="pg-workspace pg-profile">
                 <PageHeader title={t("Profile")} description={t("Shell.Desc.Profile")} />
                 <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
-                    <section className="rounded-lg border bg-card p-5">
+                    <Panel className="pg-profile-identity p-5">
                         <div className="flex items-center gap-4">
                             <Avatar className="h-16 w-16 border">
-                                <AvatarImage
-                                    src={
-                                        "https://api.dicebear.com/7.x/notionists/svg?seed=" +
-                                        profile.username
-                                    }
-                                    alt={profile.username}
-                                />
                                 <AvatarFallback>{profile.username}</AvatarFallback>
                             </Avatar>
                             <div className="min-w-0">
-                                <p className="truncate text-lg font-semibold text-foreground">
+                                <p
+                                    className="truncate text-lg font-semibold text-foreground"
+                                    title={profile.username}
+                                >
                                     {profile.username}
                                 </p>
                                 <Badge variant={isAdmin ? "default" : "secondary"} className="mt-1">
@@ -80,35 +76,35 @@ export default function ProfilePage() {
                         <dl className="mt-5 space-y-2 border-t pt-4 text-[13px]">
                             <div className="flex items-center justify-between gap-3">
                                 <dt className="text-muted-foreground">{t("Shell.LoginIP")}</dt>
-                                <dd className="truncate font-mono text-xs tabular">
-                                    {profile.login_ip || "Unknown"}
+                                <dd className="pg-profile-ip font-mono text-xs num">
+                                    {profile.login_ip || t("Unknown")}
                                 </dd>
                             </div>
                         </dl>
                         <ProfileCard className="mt-5 w-full" />
-                    </section>
+                    </Panel>
                     <div className="flex min-w-0 flex-col gap-5">
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-lg border bg-card p-4">
+                            <Panel className="p-4">
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <Server className="h-3.5 w-3.5" />
                                     {t("Server")}
                                 </div>
-                                <div className="mt-2 text-3xl font-semibold tabular text-foreground">
+                                <div className="mt-2 text-2xl font-semibold num text-foreground">
                                     {servers?.length || 0}
                                 </div>
-                            </div>
-                            <div className="rounded-lg border bg-card p-4">
+                            </Panel>
+                            <Panel className="p-4">
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <Boxes className="h-3.5 w-3.5" />
                                     {t("Shell.ServerGroup")}
                                 </div>
-                                <div className="mt-2 text-3xl font-semibold tabular text-foreground">
+                                <div className="mt-2 text-2xl font-semibold num text-foreground">
                                     {serverGroups?.length || 0}
                                 </div>
-                            </div>
+                            </Panel>
                         </div>
-                        <section className="rounded-lg border bg-card">
+                        <Panel>
                             <div className="border-b px-5 py-3.5">
                                 <h2 className="text-sm font-semibold">
                                     {t("Shell.OAuth2Bindings")}
@@ -160,7 +156,7 @@ export default function ProfilePage() {
                             ) : (
                                 <EmptyState icon={Boxes} />
                             )}
-                        </section>
+                        </Panel>
                     </div>
                 </div>
             </Page>

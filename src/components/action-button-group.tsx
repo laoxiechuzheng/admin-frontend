@@ -9,6 +9,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { cn } from "@/lib/utils"
+import { Ban, Trash2 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { IconButton } from "@/components/xui/icon-button"
 import { useTranslation } from "react-i18next"
@@ -45,14 +47,15 @@ export function ActionButtonGroup<E, U>({
     }
 
     return (
-        <div className={className}>
+        <div className={cn("sh-actions", className)}>
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="trash" />
+                    <IconButton variant="ghost" icon="trash" aria-label={t("ConfirmDeletion")} className="hover:bg-danger/10 hover:text-danger" />
                 </AlertDialogTrigger>
-                <AlertDialogContent className="sm:max-w-lg">
+                <AlertDialogContent>
                     <AlertDialogHeader>
+                        <span className="sh-confirm-icon"><Trash2 className="size-5" /></span>
                         <AlertDialogTitle>{t("ConfirmDeletion")}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {t("Results.ThisOperationIsUnrecoverable")}
@@ -91,14 +94,15 @@ export function BlockButtonGroup<E, U>({
         await mutate()
     }
     return (
-        <div className={className}>
+        <div className={cn("sh-actions", className)}>
             {children}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <IconButton variant="destructive" icon="ban" />
+                    <IconButton variant="ghost" icon="ban" aria-label={t("ConfirmBlock")} className="hover:bg-danger/10 hover:text-danger" />
                 </AlertDialogTrigger>
-                <AlertDialogContent className="sm:max-w-lg">
+                <AlertDialogContent>
                     <AlertDialogHeader>
+                        <span className="sh-confirm-icon"><Ban className="size-5" /></span>
                         <AlertDialogTitle>{t("ConfirmBlock")}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {t("Results.ThisOperationIsUnrecoverable")}

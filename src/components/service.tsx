@@ -1,5 +1,4 @@
 import { createService, updateService } from "@/api/service"
-import { FieldGroupTitle } from "@/components/page"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -23,7 +22,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -36,6 +34,7 @@ import { useNotification } from "@/hooks/useNotfication"
 import { useServer } from "@/hooks/useServer"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelService } from "@/types"
 import { serviceCoverageTypes, serviceTypes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -46,6 +45,7 @@ import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
 
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 import { Combobox } from "./ui/combobox"
 import { MultiSelect } from "./xui/multi-select"
 
@@ -155,18 +155,17 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
             <DialogTrigger asChild>
                 {data ? <IconButton variant="outline" icon="edit" /> : <IconButton icon="plus" />}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="md">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>
                                 {data ? t("EditService") : t("CreateService")}
                             </DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
-                                <FieldGroupTitle>{t("Shell.FormBasic")}</FieldGroupTitle>
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("Shell.FormBasic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -200,7 +199,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="target"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("Target")}</FormLabel>
                                             <FormControl>
                                                 <Input
@@ -243,7 +242,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="hide_for_guest"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -259,52 +258,51 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FieldGroupTitle>{t("Shell.FormProbe")}</FieldGroupTitle>
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="duration"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{t("Interval")} (s)</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        min={1}
-                                                        placeholder="30"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>
-                                                    {t("Shell.IntervalHint")}
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="failure_threshold"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{t("FailureThreshold")}</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        min={1}
-                                                        max={100}
-                                                        placeholder="7"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>
-                                                    {t("Shell.FailureThresholdHint")}
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                            </FormSheetSection>
+                            <FormSheetSection title={t("Shell.FormProbe")}>
+                                <FormField
+                                    control={form.control}
+                                    name="duration"
+                                    render={({ field }) => (
+                                        <FormItem className="fs-span-2">
+                                            <FormLabel>{t("Interval")} (s)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    placeholder="30"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("Shell.IntervalHint")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="failure_threshold"
+                                    render={({ field }) => (
+                                        <FormItem className="fs-span-2">
+                                            <FormLabel>{t("FailureThreshold")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    max={100}
+                                                    placeholder="7"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("Shell.FailureThresholdHint")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="cover"
@@ -338,7 +336,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="skip_servers_raw"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("SpecificServers")}</FormLabel>
                                             <FormControl>
                                                 <MultiSelect
@@ -351,7 +349,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FieldGroupTitle>{t("Shell.FormNotify")}</FieldGroupTitle>
+                            </FormSheetSection>
+                            <FormSheetSection title={t("Shell.FormNotify")}>
                                 <FormField
                                     control={form.control}
                                     name="notification_group_id"
@@ -374,7 +373,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="notify"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -428,7 +427,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="latency_notify"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -444,12 +443,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FieldGroupTitle>{t("Shell.FormTrigger")}</FieldGroupTitle>
+                            </FormSheetSection>
+                            <FormSheetSection title={t("Shell.FormTrigger")}>
                                 <FormField
                                     control={form.control}
                                     name="enable_trigger_task"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -469,7 +469,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="fail_trigger_tasks_raw"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>
                                                 {t("TasksToTriggerOnAlert") +
                                                     t("SeparateWithComma")}
@@ -485,7 +485,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="recover_trigger_tasks_raw"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>
                                                 {t("TasksToTriggerAfterRecovery") +
                                                     t("SeparateWithComma")}
@@ -497,18 +497,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Submit")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Submit")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

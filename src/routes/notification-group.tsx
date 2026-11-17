@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { PageErrorNotice, mobileColumns } from "./lumen-page-parts"
+
 type NotificationGroupColumn = ColumnDef<
     typeof selectableTableFeatures,
     ModelNotificationGroupResponseItem
@@ -118,18 +120,19 @@ export default function NotificationGroupPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", ["notifications"]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Shell.NotificationGroup")}
                 description={t("Shell.Desc.NotificationGroup")}
                 actions={<NotificationGroupCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

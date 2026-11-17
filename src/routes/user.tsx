@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
+import { PageErrorNotice, mobileColumns } from "./lumen-page-parts"
+
 export default function UserPage() {
     const { t } = useTranslation()
     const { data, mutate, error, isLoading } = useSWR<ModelUser[]>("/api/v1/user", swrFetcher)
@@ -60,10 +62,20 @@ export default function UserPage() {
             header: t("Username"),
             accessorKey: "username",
             accessorFn: (row) => row.username,
+            cell: ({ row }) => (
+                <span className="pg-name" title={row.original.username}>
+                    {row.original.username}
+                </span>
+            ),
         },
         {
             header: t("Role"),
             accessorKey: "role",
+            cell: ({ row }) => (
+                <span className="chip" data-tone={row.original.role === 1 ? "neutral" : "primary"}>
+                    {row.original.role === 1 ? t("User") : t("Admin")}
+                </span>
+            ),
             accessorFn: (row) => {
                 return row.role === 1 ? t("User") : t("Admin")
             },
@@ -102,18 +114,19 @@ export default function UserPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "username", ["updated_at"]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("User")}
                 description={t("Shell.Desc.User")}
                 actions={<UserCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

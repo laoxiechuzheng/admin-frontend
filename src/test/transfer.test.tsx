@@ -32,7 +32,7 @@ vi.mock("@/api/api", () => ({
 vi.mock("swr", () => ({
     default: (_key: string, _fetcher: unknown) => ({
         data: mockedRows,
-        mutate: vi.fn(),
+        mutate: mutateRows,
         error: undefined,
     }),
 }))
@@ -49,6 +49,18 @@ vi.mock("@/hooks/useMainStore", () => ({
 }))
 
 let mockedRows: ModelServerTransfer[] = []
+const mutateRows = vi.fn()
+const sockets: TransferSocket[] = []
+class TransferSocket {
+    onopen: (() => void) | null = null
+    onclose: (() => void) | null = null
+    onerror: (() => void) | null = null
+    onmessage: ((event: { data: string }) => void) | null = null
+    constructor(public url: string) {
+        sockets.push(this)
+    }
+    close() {}
+}
 
 beforeEach(() => {
     toastCalls.length = 0
@@ -56,10 +68,14 @@ beforeEach(() => {
     retryServerTransfer.mockReset()
     mockedRows = []
     mockProfile = undefined
+    sockets.length = 0
+    mutateRows.mockReset()
+    vi.stubGlobal("WebSocket", TransferSocket)
 })
 
 afterEach(() => {
     document.body.innerHTML = ""
+    vi.unstubAllGlobals()
 })
 
 function makeRow(overrides: Partial<ModelServerTransfer>): ModelServerTransfer {
@@ -132,4 +148,30 @@ test("admin sees both Cancel for pending and Retry for terminal", async () => {
 
     expect(screen.queryAllByRole("button", { name: "Cancel" }).length).toBe(1)
     expect(screen.queryAllByRole("button", { name: "Transfer.Retry" }).length).toBe(1)
+})
+
+test("connection chip follows socket open/close and every open revalidates without changing terminal permissions", async () => {
+    mockProfile = { id: 1, role: 0 }
+    mockedRows = [makeRow({ status: 1 })]
+    await renderPage()
+    expect(screen.getByRole("status").textContent).toBe("v2Pages.transfer.connecting")
+    expect(screen.getByRole("table").getAttribute("data-responsive")).toBe("cards")
+    expect(
+        screen.getAllByRole("cell").filter((cell) => cell.getAttribute("data-mobile") === "title"),
+    ).toHaveLength(1)
+    await act(async () => {
+        sockets[0].onopen?.()
+    })
+    expect(screen.getByRole("status").textContent).toBe("v2Pages.transfer.connected")
+    expect(mutateRows).toHaveBeenCalledTimes(1)
+    await act(async () => {
+        sockets[0].onopen?.()
+    })
+    expect(mutateRows).toHaveBeenCalledTimes(2)
+    await act(async () => {
+        sockets[0].onclose?.()
+    })
+    expect(screen.getByRole("status").textContent).toBe("v2Pages.transfer.reconnecting")
+    expect(screen.queryAllByRole("button", { name: "Cancel" })).toHaveLength(0)
+    expect(screen.queryAllByRole("button", { name: "Transfer.Retry" })).toHaveLength(0)
 })

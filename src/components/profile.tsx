@@ -21,15 +21,17 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMainStore } from "@/hooks/useMainStore"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
+
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 
 const profileFormSchema = z.object({
     original_password: z.string().min(5).max(72),
@@ -80,15 +82,15 @@ export const ProfileCard = ({ className }: { className: string }) => {
                     {t("UpdateProfile")}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="sm">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>{t("UpdateProfile")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.account")}>
                                 <FormField
                                     control={form.control}
                                     name="new_username"
@@ -102,6 +104,8 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.security")}>
                                 <FormField
                                     control={form.control}
                                     name="original_password"
@@ -132,7 +136,7 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                     control={form.control}
                                     name="reject_password"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
@@ -148,19 +152,19 @@ export const ProfileCard = ({ className }: { className: string }) => {
                                         </FormItem>
                                     )}
                                 />
-
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

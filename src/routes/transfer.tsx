@@ -1,8 +1,8 @@
 import { swrFetcher } from "@/api/api"
 import { cancelServerTransfer, retryServerTransfer } from "@/api/transfer"
 import { EmptyState, Page, PageHeader, Panel } from "@/components/page"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     Table,
     TableBody,
@@ -22,27 +22,26 @@ import {
     ModelServerTransferStatusVerified,
 } from "@/types"
 import { ArrowLeftRight } from "lucide-react"
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
 
-// Map status enum to a label key + a Badge variant. Centralised here so the
-// table cell and any future drawer agree. Verified is "secondary" because
-// the row is no longer actionable; Failed/Timeout use "destructive" to draw
-// the operator's attention. Cancelled is "outline" — soft signal, expected.
+import { PageErrorNotice } from "./lumen-page-parts"
+
+// 只映射已有终态的呈现；不从连接状态推断转移进度。
 const statusMeta: Record<
     ModelServerTransferStatus,
     {
         key: string
-        variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning"
+        tone: "success" | "warning" | "danger" | "neutral"
     }
 > = {
-    [ModelServerTransferStatusPending]: { key: "Transfer.StatusPending", variant: "warning" },
-    [ModelServerTransferStatusVerified]: { key: "Transfer.StatusVerified", variant: "success" },
-    [ModelServerTransferStatusFailed]: { key: "Transfer.StatusFailed", variant: "destructive" },
-    [ModelServerTransferStatusTimeout]: { key: "Transfer.StatusTimeout", variant: "destructive" },
-    [ModelServerTransferStatusCancelled]: { key: "Transfer.StatusCancelled", variant: "outline" },
+    [ModelServerTransferStatusPending]: { key: "Transfer.StatusPending", tone: "warning" },
+    [ModelServerTransferStatusVerified]: { key: "Transfer.StatusVerified", tone: "success" },
+    [ModelServerTransferStatusFailed]: { key: "Transfer.StatusFailed", tone: "danger" },
+    [ModelServerTransferStatusTimeout]: { key: "Transfer.StatusTimeout", tone: "danger" },
+    [ModelServerTransferStatusCancelled]: { key: "Transfer.StatusCancelled", tone: "neutral" },
 }
 
 export default function TransferPage() {
@@ -50,7 +49,13 @@ export default function TransferPage() {
     const { profile } = useAuth()
     const isAdmin = profile?.role === 0
     const callerID = profile?.id
-    const { data, mutate, error } = useSWR<ModelServerTransfer[]>("/api/v1/transfer", swrFetcher)
+    const { data, mutate, error, isLoading } = useSWR<ModelServerTransfer[]>(
+        "/api/v1/transfer",
+        swrFetcher,
+    )
+    const [connection, setConnection] = useState<"connecting" | "connected" | "reconnecting">(
+        "connecting",
+    )
 
     useEffect(() => {
         if (error) {
@@ -86,6 +91,7 @@ export default function TransferPage() {
             wsRef.current = ws
 
             ws.onopen = () => {
+                setConnection("connected")
                 backoffMs = 1000
                 // Backfill anything the broker fanned out while we were
                 // reconnecting — the broker drops events for full subscribers
@@ -113,6 +119,7 @@ export default function TransferPage() {
             const scheduleReconnect = () => {
                 if (cancelled) return
                 if (reconnectTimer !== null) return
+                setConnection("reconnecting")
                 const delay = backoffMs
                 backoffMs = Math.min(backoffMs * 2, maxBackoffMs)
                 reconnectTimer = setTimeout(() => {
@@ -182,27 +189,62 @@ export default function TransferPage() {
     const rows = useMemo(() => data ?? [], [data])
 
     return (
-        <Page>
-            <PageHeader title={t("Transfer.Title")} description={t("Transfer.PageHint")} />
+        <Page className="pg-workspace">
+            <PageHeader
+                title={t("Transfer.Title")}
+                description={t("Transfer.PageHint")}
+                actions={
+                    <span
+                        role="status"
+                        className="chip"
+                        data-tone={
+                            connection === "connected"
+                                ? "success"
+                                : connection === "connecting"
+                                  ? "warning"
+                                  : "danger"
+                        }
+                    >
+                        {t(`v2Pages.transfer.${connection}`)}
+                    </span>
+                }
+            />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
-                <Table className="min-w-[960px]">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>{t("ServerID")}</TableHead>
-                            <TableHead>{t("Transfer.From")}</TableHead>
-                            <TableHead>{t("Transfer.To")}</TableHead>
-                            <TableHead>{t("Transfer.Initiator")}</TableHead>
-                            <TableHead>{t("Status")}</TableHead>
-                            <TableHead>{t("Transfer.LastError")}</TableHead>
-                            <TableHead>{t("CreatedAt")}</TableHead>
-                            <TableHead>{t("Actions")}</TableHead>
+                <Table
+                    role="table"
+                    data-responsive="cards"
+                    className="pg-native-table min-w-[960px]"
+                >
+                    <TableHeader role="rowgroup">
+                        <TableRow role="row">
+                            <TableHead role="columnheader" data-mobile="title">
+                                ID
+                            </TableHead>
+                            <TableHead role="columnheader">{t("ServerID")}</TableHead>
+                            <TableHead role="columnheader">{t("Transfer.From")}</TableHead>
+                            <TableHead role="columnheader">{t("Transfer.To")}</TableHead>
+                            <TableHead role="columnheader">{t("Transfer.Initiator")}</TableHead>
+                            <TableHead role="columnheader">{t("Status")}</TableHead>
+                            <TableHead role="columnheader">{t("Transfer.LastError")}</TableHead>
+                            <TableHead role="columnheader">{t("CreatedAt")}</TableHead>
+                            <TableHead role="columnheader" data-mobile="actions">
+                                {t("Actions")}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
-                        {rows.length === 0 ? (
-                            <TableRow className="hover:bg-transparent">
-                                <TableCell colSpan={9} className="p-0">
+                    <TableBody role="rowgroup">
+                        {isLoading ? (
+                            Array.from({ length: 3 }, (_, i) => (
+                                <TableRow role="row" key={`loading-${i}`}>
+                                    <TableCell role="cell" colSpan={9}>
+                                        <Skeleton className="h-4 w-full max-w-[60%]" />
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : rows.length === 0 ? (
+                            <TableRow role="row" className="hover:bg-transparent">
+                                <TableCell role="cell" colSpan={9} className="p-0">
                                     <EmptyState icon={ArrowLeftRight} />
                                 </TableCell>
                             </TableRow>
@@ -215,35 +257,80 @@ export default function TransferPage() {
                                     row.status === ModelServerTransferStatusTimeout ||
                                     row.status === ModelServerTransferStatusCancelled
                                 return (
-                                    <TableRow key={row.id} className="whitespace-nowrap">
-                                        <TableCell className="font-mono text-xs tabular text-muted-foreground">
+                                    <TableRow role="row" key={row.id} className="whitespace-nowrap">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="title"
+                                            data-label="ID"
+                                            className="font-mono text-xs num text-muted-foreground"
+                                        >
                                             {row.id}
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs tabular">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("ServerID")}
+                                            className="font-mono text-xs num"
+                                        >
                                             {row.server_id}
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs tabular">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("Transfer.From")}
+                                            className="font-mono text-xs num"
+                                        >
                                             {row.from_user_id}
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs tabular">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("Transfer.To")}
+                                            className="font-mono text-xs num"
+                                        >
                                             {row.to_user_id}
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs tabular">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("Transfer.Initiator")}
+                                            className="font-mono text-xs num"
+                                        >
                                             {row.initiator_id}
                                         </TableCell>
-                                        <TableCell>
-                                            <Badge variant={meta.variant}>{t(meta.key)}</Badge>
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("Status")}
+                                        >
+                                            <span className="chip" data-tone={meta.tone}>
+                                                {t(meta.key)}
+                                            </span>
                                         </TableCell>
                                         <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("Transfer.LastError")}
+                                            data-span="full"
                                             className="max-w-xs truncate"
                                             title={row.last_error}
                                         >
                                             {row.last_error || "-"}
                                         </TableCell>
-                                        <TableCell className="whitespace-nowrap text-xs tabular text-muted-foreground">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="meta"
+                                            data-label={t("CreatedAt")}
+                                            data-span="full"
+                                            className="whitespace-nowrap text-xs num text-muted-foreground"
+                                        >
                                             {new Date(row.created_at).toLocaleString()}
                                         </TableCell>
-                                        <TableCell className="space-x-2">
+                                        <TableCell
+                                            role="cell"
+                                            data-mobile="actions"
+                                            className="space-x-2"
+                                        >
                                             {isPending &&
                                                 (isAdmin || row.from_user_id === callerID) && (
                                                     <Button

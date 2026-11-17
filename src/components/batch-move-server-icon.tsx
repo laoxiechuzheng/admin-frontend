@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { IconButton } from "@/components/xui/icon-button"
+import "@/styles/forms.css"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+import { FormSheetSection } from "./form-sheet"
 import { Textarea } from "./ui/textarea"
 
 interface BatchMoveServerIconProps extends ButtonProps {
@@ -88,43 +89,46 @@ export const BatchMoveServerIcon: React.FC<BatchMoveServerIconProps> = ({
             <DialogTrigger asChild>
                 <IconButton {...props} icon="user-pen" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
-                            <DialogTitle>{t("BatchMoveServer")}</DialogTitle>
-                            <DialogDescription />
-                        </DialogHeader>
-                        <div className="flex flex-col gap-3 mt-4">
-                            <Label>{t("Servers")}</Label>
-                            <Textarea disabled>{serverIds.join(", ")}</Textarea>
-                            <Label>{t("ToUser")}</Label>
-                            <Input
-                                type="number"
-                                placeholder="User ID"
-                                value={toUserId}
-                                onChange={(e) => {
-                                    setToUserId(parseInt(e.target.value, 10))
-                                }}
-                            />
-                            <DialogFooter className="justify-end pt-2">
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                        {t("Cancel")}
-                                    </Button>
-                                </DialogClose>
-                                <Button
-                                    disabled={!toUserId || toUserId == 0}
-                                    type="submit"
-
-                                    onClick={onSubmit}
-                                >
-                                    {t("Move")}
-                                </Button>
-                            </DialogFooter>
-                        </div>
+            <DialogContent variant="sheet" size="sm">
+                <div className="fs-sheet-form">
+                    <DialogHeader className="fs-sheet-head">
+                        <DialogTitle>{t("BatchMoveServer")}</DialogTitle>
+                        <DialogDescription />
+                    </DialogHeader>
+                    <div className="fs-sheet-body">
+                        <FormSheetSection title={t("v2Forms.sections.transfer")}>
+                            <div className="space-y-2">
+                                <Label>{t("Servers")}</Label>
+                                <Textarea disabled>{serverIds.join(", ")}</Textarea>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>{t("ToUser")}</Label>
+                                <Input
+                                    type="number"
+                                    placeholder="User ID"
+                                    value={toUserId}
+                                    onChange={(e) => {
+                                        setToUserId(parseInt(e.target.value, 10))
+                                    }}
+                                />
+                            </div>
+                        </FormSheetSection>
                     </div>
-                </ScrollArea>
+                    <DialogFooter className="fs-sheet-foot">
+                        <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                                {t("Cancel")}
+                            </Button>
+                        </DialogClose>
+                        <Button
+                            disabled={!toUserId || toUserId == 0}
+                            type="submit"
+                            onClick={onSubmit}
+                        >
+                            {t("Move")}
+                        </Button>
+                    </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     )

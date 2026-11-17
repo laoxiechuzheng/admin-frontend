@@ -1,7 +1,6 @@
 import { swrFetcher } from "@/api/api"
 import { deleteCron, runCron } from "@/api/cron"
 import { ActionButtonGroup } from "@/components/action-button-group"
-import { CopyButton } from "@/components/copy-button"
 import { CronCard } from "@/components/cron"
 import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
@@ -17,6 +16,8 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
+
+import { CopyValue, PageErrorNotice, mobileColumns } from "./lumen-page-parts"
 
 export default function CronPage() {
     const { t } = useTranslation()
@@ -78,6 +79,11 @@ export default function CronPage() {
             header: t("Type"),
             accessorKey: "taskType",
             accessorFn: (row) => cronTypes[row.task_type] || "",
+            cell: ({ row }) => (
+                <span className="chip pg-type" data-tone="neutral">
+                    {cronTypes[row.original.task_type] || ""}
+                </span>
+            ),
         },
         {
             header: t("CronExpression"),
@@ -89,7 +95,7 @@ export default function CronPage() {
             accessorKey: "command",
             cell: ({ row }) => {
                 const s = row.original
-                return <CopyButton text={s.command} />
+                return <CopyValue value={s.command} />
             },
         },
         {
@@ -180,6 +186,8 @@ export default function CronPage() {
                             <IconButton
                                 variant="outline"
                                 icon="play"
+                                title={t("v2Pages.actions.runTask")}
+                                aria-label={t("v2Pages.actions.runTask")}
                                 onClick={async () => {
                                     try {
                                         await runCron(s.id)
@@ -212,18 +220,24 @@ export default function CronPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", [
+            "scheduler",
+            "command",
+            "servers",
+            "lastExecution",
+        ]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Task")}
                 description={t("Shell.Desc.Cron")}
                 actions={<CronCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

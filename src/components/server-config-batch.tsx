@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { IconButton } from "@/components/xui/icon-button"
+import "@/styles/forms.css"
 import { ModelServerTaskResponse } from "@/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+import { FormSheetSection } from "./form-sheet"
 import { Pusher } from "./xui/pusher"
 
 interface ServerConfigCardBatchProps extends ButtonProps {
@@ -69,45 +70,51 @@ export const ServerConfigCardBatch: React.FC<ServerConfigCardBatchProps> = ({ si
             <DialogTrigger asChild>
                 <IconButton {...props} icon="cog" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
-                            <DialogTitle>{t("EditServerConfig")}</DialogTitle>
-                            <DialogDescription />
-                        </DialogHeader>
-                        <div className="flex flex-col gap-3 mt-4">
-                            <Label>{t("Option")}</Label>
-                            <Input
-                                type="text"
-                                placeholder="option"
-                                value={currentKey}
-                                onChange={(e) => {
-                                    setCurrentKey(e.target.value)
-                                }}
-                            />
-                            <Label>{t("Value")}</Label>
-                            <Textarea
-                                className="resize-y"
-                                value={currentVal}
-                                onChange={(e) => {
-                                    setCurrentVal(e.target.value)
-                                }}
-                            />
-                            <Pusher property={[currentKey, currentVal]} setData={setData} />
-                            <DialogFooter className="justify-end pt-2">
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                        {t("Close")}
-                                    </Button>
-                                </DialogClose>
-                                <Button type="submit" onClick={onSubmit}>
-                                    {t("Submit")}
-                                </Button>
-                            </DialogFooter>
-                        </div>
+            <DialogContent variant="sheet" size="md">
+                <div className="fs-sheet-form">
+                    <DialogHeader className="fs-sheet-head">
+                        <DialogTitle>{t("EditServerConfig")}</DialogTitle>
+                        <DialogDescription />
+                    </DialogHeader>
+                    <div className="fs-sheet-body">
+                        <FormSheetSection title={t("v2Forms.sections.advanced")}>
+                            <div className="fs-span-2 space-y-2">
+                                <Label>{t("Option")}</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="option"
+                                    value={currentKey}
+                                    onChange={(e) => {
+                                        setCurrentKey(e.target.value)
+                                    }}
+                                />
+                            </div>
+                            <div className="fs-span-2 space-y-2">
+                                <Label>{t("Value")}</Label>
+                                <Textarea
+                                    className="fs-code resize-y"
+                                    value={currentVal}
+                                    onChange={(e) => {
+                                        setCurrentVal(e.target.value)
+                                    }}
+                                />
+                            </div>
+                            <div className="fs-span-2">
+                                <Pusher property={[currentKey, currentVal]} setData={setData} />
+                            </div>
+                        </FormSheetSection>
                     </div>
-                </ScrollArea>
+                    <DialogFooter className="fs-sheet-foot">
+                        <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                                {t("Close")}
+                            </Button>
+                        </DialogClose>
+                        <Button type="submit" onClick={onSubmit}>
+                            {t("Submit")}
+                        </Button>
+                    </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     )

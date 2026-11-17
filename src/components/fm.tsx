@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { virtualizedTableFeatures } from "@/lib/table"
 import { copyToClipboard, fm, formatPath, fmWorker as worker } from "@/lib/utils"
+import "@/styles/forms.css"
 import {
     FMEntry,
     FMIdentifier,
@@ -333,7 +334,7 @@ export const FMComponent: React.FC<FMProps & JSX.IntrinsicElements["div"]> = ({
     const [gotoPath, setGotoPath] = useState("")
     return (
         <div ref={fmRef} {...props}>
-            <div className="flex items-center gap-2">
+            <div className="fs-fm-head flex items-center gap-2">
                 <AlertDialog>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -470,7 +471,7 @@ export const FMCard = ({ id }: { id?: string }) => {
             <SheetTrigger asChild>
                 <IconButton icon="folder-closed" onClick={fetchFM} />
             </SheetTrigger>
-            <SheetContent setOpen={setOpen} className="min-w-[35%] border-l">
+            <SheetContent setOpen={setOpen} className="fs-fm-sheet min-w-[35%] border-l">
                 <div className="overflow-auto">
                     <SheetTitle />
                     <SheetHeader className="pb-2">
@@ -478,7 +479,7 @@ export const FMCard = ({ id }: { id?: string }) => {
                     </SheetHeader>
                     {fm?.session_id && init ? (
                         <FMComponent
-                            className="p-1 space-y-5"
+                            className="fs-fm-body p-1 space-y-5"
                             wsUrl={`/api/v1/ws/file/${fm.session_id}`}
                         />
                     ) : (
@@ -492,7 +493,7 @@ export const FMCard = ({ id }: { id?: string }) => {
             <DrawerTrigger asChild>
                 <IconButton icon="folder-closed" onClick={fetchFM} />
             </DrawerTrigger>
-            <DrawerContent className="min-h-[60%] p-4">
+            <DrawerContent className="fs-fm-drawer min-h-[60%] p-4">
                 <div className="overflow-auto">
                     <DrawerTitle />
                     <DrawerHeader className="pb-2">
@@ -500,7 +501,7 @@ export const FMCard = ({ id }: { id?: string }) => {
                     </DrawerHeader>
                     {fm?.session_id && init ? (
                         <FMComponent
-                            className="p-1 space-y-5"
+                            className="fs-fm-body p-1 space-y-5"
                             wsUrl={`/api/v1/ws/file/${fm.session_id}`}
                         />
                     ) : (

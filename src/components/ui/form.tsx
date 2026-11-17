@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { AlertCircle } from "lucide-react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import {
@@ -151,9 +152,10 @@ const FormMessage = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagrap
             <p
                 ref={ref}
                 id={formMessageId}
-                className={cn("text-xs font-medium text-destructive", className)}
+                className={cn("flex items-start gap-1.5 text-xs font-medium text-destructive", className)}
                 {...props}
             >
+                <AlertCircle aria-hidden="true" className="mt-px size-3.5 shrink-0" />
                 {body}
             </p>
         )

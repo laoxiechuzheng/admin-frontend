@@ -23,7 +23,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -47,6 +46,7 @@ import {
 } from "@/lib/public-note"
 import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelServer } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { HelpCircle } from "lucide-react"
@@ -56,6 +56,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
+
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 
 interface ServerCardProps {
     data: ModelServer
@@ -241,18 +243,19 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 <IconButton variant="outline" icon="edit" />
             </DialogTrigger>
             <DialogContent
-                className="sm:max-w-xl"
+                variant="sheet"
+                size="md"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>{t("EditServer")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.basic")}>
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -279,13 +282,15 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("DDNS")}>
                                 {enableDDNS ? (
                                     <>
                                         <FormField
                                             control={form.control}
                                             name="ddns_profiles_raw"
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className="fs-span-2">
                                                     <FormLabel>
                                                         {t("DDNSProfiles") + t("SeparateWithComma")}
                                                     </FormLabel>
@@ -300,7 +305,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             control={form.control}
                                             name="override_ddns_domains_raw"
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className="fs-span-2">
                                                     <FormLabel>
                                                         {t("OverrideDDNSDomains")}
                                                     </FormLabel>
@@ -320,9 +325,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="enable_ddns"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
-                                                <div className="flex items-center gap-2">
+                                                <div className="fs-note-tools">
                                                     <Checkbox
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
@@ -336,13 +341,15 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                            </FormSheetSection>
+                            <FormSheetSection title={t("v2Forms.sections.notes")}>
                                 <FormField
                                     control={form.control}
                                     name="hide_for_guest"
                                     render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
+                                        <FormItem className="fs-check flex items-center">
                                             <FormControl>
-                                                <div className="flex items-center gap-2">
+                                                <div className="fs-note-tools">
                                                     <Checkbox
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
@@ -360,7 +367,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     control={form.control}
                                     name="note"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="fs-span-2">
                                             <FormLabel>{t("Private") + t("Note")}</FormLabel>
                                             <FormControl>
                                                 <Textarea className="resize-none" {...field} />
@@ -370,10 +377,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 {/* Public Note controls (optional + dual mode) */}
-                                <div className="space-y-3">
+                                <div className="fs-span-2 space-y-3">
                                     <div className="space-y-1">
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
+                                            <div className="fs-note-tools">
                                                 <FormLabel>{t("PublicNote.Label")}</FormLabel>
                                                 <a
                                                     href="https://nezha.wiki/guide/servers.html#%E5%85%AC%E5%BC%80%E5%A4%87%E6%B3%A8%E8%AE%BE%E7%BD%AE"
@@ -388,9 +395,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     </div>
 
                                     {/* Toggle: when disabled, hide edit controls and submit an empty value */}
-                                    <div className="flex items-center gap-4">
+                                    <div className="fs-note-modes">
                                         {/* Mode switch: Raw text / Custom fields */}
-                                        <div className="flex items-center gap-2">
+                                        <div className="fs-note-tools">
                                             {/* Show 'structured' first, then 'raw' */}
                                             <Button
                                                 type="button"
@@ -435,11 +442,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     {/* Custom fields mode: keep structured editing; serialize to string on submit */}
                                     {publicNoteMode === "structured" && (
                                         <>
-                                            <div className="rounded-md border p-3 space-y-3">
+                                            <div className="fs-editor space-y-3">
                                                 <div className="text-sm font-medium opacity-80">
                                                     {t("PublicNote.Billing")}
                                                 </div>
-                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                <div className="fs-grid">
                                                     <div className="space-y-1">
                                                         <Label className="text-xs">
                                                             {t("PublicNote.StartDate")}
@@ -523,7 +530,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         )}
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="fs-note-tools">
                                                             <Label className="text-xs">
                                                                 {t("PublicNote.EndDate")}
                                                             </Label>
@@ -632,7 +639,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         )}
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="fs-note-tools">
                                                             <Label className="text-xs">
                                                                 {t("PublicNote.AutoRenewal")}
                                                             </Label>
@@ -671,7 +678,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         )}
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="fs-note-tools">
                                                             <Label className="text-xs">
                                                                 {t("PublicNote.Cycle")}
                                                             </Label>
@@ -724,8 +731,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             </p>
                                                         )}
                                                     </div>
-                                                    <div className="space-y-1 sm:col-span-2">
-                                                        <div className="flex items-center gap-2">
+                                                    <div className="fs-span-2 space-y-1">
+                                                        <div className="fs-note-tools">
                                                             <Label className="text-xs">
                                                                 {t("PublicNote.Amount")}
                                                             </Label>
@@ -772,11 +779,11 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                 </div>
                                             </div>
 
-                                            <div className="rounded-md border p-3 space-y-3">
+                                            <div className="fs-editor space-y-3">
                                                 <div className="text-sm font-medium opacity-80">
                                                     {t("PublicNote.Plan")}
                                                 </div>
-                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                <div className="fs-grid">
                                                     <div className="space-y-1">
                                                         <Label className="text-xs">
                                                             {t("PublicNote.Bandwidth")}
@@ -813,7 +820,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="fs-note-tools">
                                                             <Label className="text-xs">
                                                                 {t("PublicNote.TrafficType")}
                                                             </Label>
@@ -945,7 +952,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                                             }
                                                         />
                                                     </div>
-                                                    <div className="space-y-1 sm:col-span-2">
+                                                    <div className="fs-span-2 space-y-1">
                                                         <Label className="text-xs">
                                                             {t("PublicNote.Extra")}
                                                         </Label>
@@ -970,18 +977,19 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </>
                                     )}
                                 </div>
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Submit")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Submit")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

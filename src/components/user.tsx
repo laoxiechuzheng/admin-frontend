@@ -19,7 +19,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Select,
     SelectContent,
@@ -28,6 +27,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { IconButton } from "@/components/xui/icon-button"
+import "@/styles/forms.css"
 import { ModelUser } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
@@ -36,6 +36,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
 import { z } from "zod"
+
+import { FormDirtyHint, FormSheetSection } from "./form-sheet"
 
 interface UserCardProps {
     mutate: KeyedMutator<ModelUser[]>
@@ -83,15 +85,15 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
             <DialogTrigger asChild>
                 <IconButton icon="plus" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="-mx-5 max-h-[calc(100dvh-6rem)] px-5 sm:-mx-6 sm:px-6">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
+            <DialogContent variant="sheet" size="sm">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="fs-sheet-form">
+                        <DialogHeader className="fs-sheet-head">
                             <DialogTitle>{t("NewUser")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5 space-y-4">
+                        <div className="fs-sheet-body">
+                            <FormSheetSection title={t("v2Forms.sections.account")}>
                                 <FormField
                                     control={form.control}
                                     name="username"
@@ -146,18 +148,19 @@ export const UserCard: React.FC<UserCardProps> = ({ mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <DialogFooter className="justify-end pt-2">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary">
-                                            {t("Close")}
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="submit">{t("Confirm")}</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </div>
-                </ScrollArea>
+                            </FormSheetSection>
+                        </div>
+                        <DialogFooter className="fs-sheet-foot">
+                            <FormDirtyHint />
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    {t("Close")}
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t("Confirm")}</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

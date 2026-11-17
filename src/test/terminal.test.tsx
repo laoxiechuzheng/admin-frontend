@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
+import { XtermComponent } from "../components/terminal"
 
 const terminalMocks = vi.hoisted(() => ({
     instances: [] as Array<{
@@ -101,7 +102,6 @@ afterEach(() => {
 })
 
 test("XtermComponent closes the previous WebSocket and recreates xterm when wsUrl changes", async () => {
-    const { XtermComponent } = await import("../components/terminal")
     const noop = () => undefined
 
     const { rerender } = render(
@@ -120,7 +120,6 @@ test("XtermComponent closes the previous WebSocket and recreates xterm when wsUr
 })
 
 test("mobile controls send text keys and preserve one-shot Ctrl across xterm paste", async () => {
-    const { XtermComponent } = await import("../components/terminal")
     Object.defineProperty(navigator, "clipboard", {
         configurable: true,
         value: { readText: vi.fn().mockResolvedValue("first line\n第二行") },
@@ -144,7 +143,6 @@ test("mobile controls send text keys and preserve one-shot Ctrl across xterm pas
 })
 
 test("xterm output and binary input remain byte-safe without AttachAddon", async () => {
-    const { XtermComponent } = await import("../components/terminal")
     render(<XtermComponent wsUrl="/api/v1/ws/terminal/bytes" setClose={() => undefined} />)
     const socket = FakeWebSocket.instances[0]
     act(() => socket.open())
@@ -161,4 +159,42 @@ test("xterm output and binary input remain byte-safe without AttachAddon", async
 
     fireEvent.click(screen.getByRole("button", { name: "Escape" }))
     expect(socket.send).toHaveBeenLastCalledWith("\x1b")
+})
+
+test("connection callback identity changes do not reconnect and unmount still clears handlers", () => {
+    const initialCallback = vi.fn()
+    const latestCallback = vi.fn()
+    const setClose = vi.fn()
+    const { rerender, unmount, container } = render(
+        <XtermComponent
+            wsUrl="/api/v1/ws/terminal/connection-state"
+            setClose={setClose}
+            onConnectionStateChange={initialCallback}
+        />,
+    )
+    const socket = FakeWebSocket.instances[0]
+    expect(initialCallback).toHaveBeenLastCalledWith("connecting")
+    expect(container.firstElementChild?.hasAttribute("onconnectionstatechange")).toBe(false)
+    rerender(
+        <XtermComponent
+            wsUrl="/api/v1/ws/terminal/connection-state"
+            setClose={setClose}
+            onConnectionStateChange={latestCallback}
+        />,
+    )
+    expect(FakeWebSocket.instances).toHaveLength(1)
+    expect(terminalMocks.instances).toHaveLength(1)
+    expect(socket.closeCalls).toBe(0)
+    act(() => socket.open())
+    expect(latestCallback).toHaveBeenLastCalledWith("connected")
+    expect(initialCallback).toHaveBeenCalledTimes(1)
+    act(() => socket.onclose?.(new Event("close")))
+    expect(latestCallback).toHaveBeenLastCalledWith("disconnected")
+    expect(setClose).toHaveBeenCalledWith(true)
+    unmount()
+    expect(socket.closeCalls).toBeGreaterThanOrEqual(1)
+    expect(socket.onopen).toBeNull()
+    expect(socket.onmessage).toBeNull()
+    expect(socket.onclose).toBeNull()
+    expect(socket.onerror).toBeNull()
 })

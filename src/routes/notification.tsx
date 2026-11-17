@@ -1,11 +1,10 @@
 import { swrFetcher } from "@/api/api"
 import { deleteNotification } from "@/api/notification"
 import { ActionButtonGroup } from "@/components/action-button-group"
-import { CopyButton } from "@/components/copy-button"
 import { DataTable } from "@/components/data-table"
 import { HeaderButtonGroup } from "@/components/header-button-group"
 import { NotifierCard } from "@/components/notifier"
-import { EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
+import { BoolCell, EmptyState, Page, PageHeader, Panel, Toolbar } from "@/components/page"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useNotification } from "@/hooks/useNotfication"
 import { selectableTableFeatures } from "@/lib/table"
@@ -16,6 +15,8 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import useSWR from "swr"
+
+import { CopyValue, PageErrorNotice, mobileColumns } from "./lumen-page-parts"
 
 export default function NotificationPage() {
     const { t } = useTranslation()
@@ -95,13 +96,14 @@ export default function NotificationPage() {
             accessorFn: (row) => row.url,
             cell: ({ row }) => {
                 const s = row.original
-                return <CopyButton text={s.url} />
+                return <CopyValue value={s.url} />
             },
         },
         {
             header: t("VerifyTLS"),
             accessorKey: "verify_tls",
             accessorFn: (row) => row.verify_tls,
+            cell: ({ row }) => <BoolCell value={row.original.verify_tls} />,
         },
         {
             id: "actions",
@@ -131,18 +133,19 @@ export default function NotificationPage() {
     const table = useTable({
         features: selectableTableFeatures,
         data: dataCache,
-        columns,
+        columns: mobileColumns(columns, "name", ["groups", "url"]),
     })
 
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <Page>
+        <Page className="pg-workspace">
             <PageHeader
                 title={t("Shell.Notifier")}
                 description={t("Shell.Desc.Notifier")}
                 actions={<NotifierCard mutate={mutate} />}
             />
+            {error && <PageErrorNotice retry={() => mutate()} />}
             <Panel>
                 <Toolbar selected={selectedRows.length}>
                     <HeaderButtonGroup

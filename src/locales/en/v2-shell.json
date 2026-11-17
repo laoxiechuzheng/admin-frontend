@@ -1,0 +1,10 @@
+{
+  "v2Shell": {
+    "header": { "visitors": "Online visitors", "disconnected": "Disconnected, reconnecting" },
+    "login": { "title": "Sign in", "subtitle": "Management console" },
+    "navigation": { "toggle": "Open navigation", "administrator": "Administrator", "member": "Member" },
+    "table": { "selectedPage": "{{count}} selected on this page" },
+    "actions": { "deleteSelected": "Delete selected", "blockSelected": "Block selected", "edit": "Edit", "update": "Update", "openFolder": "Open folder", "run": "Run", "download": "Download", "upload": "Upload", "menu": "Open menu", "block": "Block", "expand": "Expand", "remove": "Remove", "editOwner": "Change owner", "more": "More actions" },
+    "error": { "title": "Unable to load this page", "description": "An unexpected error occurred.", "back": "Back to dashboard" }
+  }
+}

@@ -8,6 +8,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import useSettings from "@/hooks/useSetting"
 import { copyToClipboard } from "@/lib/utils"
+import "@/styles/forms.css"
 import { ModelProfile, ModelSetting } from "@/types"
 import i18next from "i18next"
 import { Check, Copy, Download } from "lucide-react"
@@ -94,6 +95,7 @@ export const InstallCommandsMenu = forwardRef<HTMLButtonElement, InstallCommands
                     )}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
+                    className="fs-install-menu"
                     side={menuItem ? "right" : undefined}
                     align={menuItem ? "start" : undefined}
                 >
